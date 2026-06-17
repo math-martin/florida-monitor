@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Florida 2027"/>
+<title>🌴 Passagens Florida 2027</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#060d1a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.card{background:linear-gradient(135deg,#0f1f38,#0a1628);border:1px solid #1e3a5f;border-radius:18px;padding:16px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useMemo}=React;
+const {LineChart,Line,BarChart,Bar,XAxis,YAxis,Tooltip,CartesianGrid,ReferenceLine,ResponsiveContainer,Cell}=Recharts;
+
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const SHEETS_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSIBq1y2H4_Q1qCEG9kXdTEmQAtiNrS6kzb9n8sDdFUbVq-gKL_rYRS-IqOHyq6iwPvSNTn_wPnocRh/pub?gid=1427060977&single=true&output=csv";
+const REF={econ:{fire:3500,good:4500,avg:5200,high:6500},exec:{fire:9000,good:13000,avg:16000,high:22000}};
+const CORES={latam:"#e31837",american:"#0078d2",copa:"#004b87",tap:"#006b3f",united:"#003087",delta:"#c41230",outro:"#64748b"};
+const ciaColor=n=>{const k=(n||"").toLowerCase();return CORES[Object.keys(CORES).find(c=>k.includes(c))||"outro"]};
+const parsePrice=s=>parseInt(String(s||"").replace(/[R$\s]/g,"").replace(/\./g,"").replace(",","."))||0;
+const fmt=v=>v?`R$ ${Number(v).toLocaleString("pt-BR")}`:"—";
+const fmtK=v=>v?`R$${(v/1000).toFixed(1)}k`:"—";
+
+// ── DADOS DE REFERÊNCIA ───────────────────────────────────────────────────────
+const REFS_ECON=[
+  {label:"🔥 Promoção",range:"R$ 2.200 – R$ 3.500",color:"#22c55e",tip:"Raridade — compre imediatamente!"},
+  {label:"✅ Boa oferta",range:"R$ 3.500 – R$ 4.500",color:"#86efac",tip:"Abaixo da média histórica"},
+  {label:"😐 Preço normal",range:"R$ 4.500 – R$ 5.500",color:"#f59e0b",tip:"Faixa típica de mercado"},
+  {label:"😬 Acima da média",range:"R$ 5.500 – R$ 6.500",color:"#f97316",tip:"Espere uma queda"},
+  {label:"🚫 Caro demais",range:"Acima de R$ 6.500",color:"#ef4444",tip:"Não compre"},
+];
+const REFS_EXEC=[
+  {label:"🔥 Promoção",range:"R$ 5.000 – R$ 9.000",color:"#22c55e",tip:"Erro de tarifa ou promoção pontual"},
+  {label:"✅ Boa oferta",range:"R$ 9.000 – R$ 13.000",color:"#86efac",tip:"Excelente custo-benefício"},
+  {label:"😐 Preço normal",range:"R$ 13.000 – R$ 18.000",color:"#f59e0b",tip:"Faixa típica executiva"},
+  {label:"🚫 Caro",range:"Acima de R$ 18.000",color:"#ef4444",tip:"Considere usar milhas"},
+];
+const DICAS=[
+  {emoji:"📅",titulo:"Melhor momento para comprar",corpo:"Para Maio 2027, a janela ideal é Agosto–Outubro 2026. Passagens costumam abrir com 11 meses de antecedência e atingem o menor preço entre 3–6 meses antes da viagem."},
+  {emoji:"📆",titulo:"Melhores dias para embarcar",corpo:"Terça e quarta-feira são historicamente 15–25% mais baratos que fins de semana. Evite embarcar sexta ou domingo — pico de demanda."},
+  {emoji:"🔄",titulo:"Open Jaw vale muito mais",corpo:"Voe GRU→MCO (Orlando) na ida e MIA→GRU (Miami) na volta. Você não perde tempo voltando ao ponto de partida e ainda economiza no carro alugado, que fica sem taxa de devolução em aeroporto diferente."},
+  {emoji:"🏆",titulo:"Milhas valem ouro na executiva",corpo:"LATAM Pass, Smiles (Gol) e Livelo acumulam pontos no cartão. Executiva Brasil→EUA pode sair de 80–130k pontos + taxas. MaxMilhas e Melhores Destinos monitoram assentos disponíveis."},
+  {emoji:"🧳",titulo:"Sempre filtre com bagagem inclusa",corpo:"Tarifas Light (sem bagagem) parecem baratas mas somando a mala despachada ($35–60 por trecho) saem mais caro. Exija pelo menos 23kg inclusos na tarifa."},
+  {emoji:"👶",titulo:"Luca com 2 anos e 4 meses",corpo:"Crianças de 2 anos sem assento próprio pagam 10% do adulto — mas numa viagem de 10h+ para os EUA, vale muito pagar o assento. Com assento, a tarifa varia de 50–75% do adulto dependendo da cia."},
+  {emoji:"⚡",titulo:"Erros de tarifa existem",corpo:"Assine Passagens Imperdíveis e Melhores Destinos — eles capturam quando uma cia lança por engano executiva a preço de econômica. Janela de compra: 2–6 horas. Depois corrigem."},
+  {emoji:"🗓️",titulo:"Evite Memorial Day",corpo:"Nos EUA, o feriado Memorial Day é sempre na última segunda de Maio. Em 2027 é 26/05. Evite retornar nessa data — preços sobem 30–50% e aeroportos ficam lotados."},
+];
+const MESES=[
+  {mes:"Mai 2026",acao:"Passagens ainda não abertas",status:"wait"},
+  {mes:"Jun–Jul 2026",acao:"Iniciar monitoramento — configure alertas",status:"start"},
+  {mes:"Ago–Set 2026",acao:"🎯 MELHOR JANELA — compre aqui se preço estiver bom",status:"buy"},
+  {mes:"Out–Nov 2026",acao:"Segunda chance + Black Friday de passagens",status:"ok"},
+  {mes:"Dez 2026",acao:"⚠️ Risco aumenta — preços sobem com proximidade",status:"warn"},
+  {mes:"Jan–Mar 2027",acao:"🚨 Última chance — tende a ser caro",status:"danger"},
+];
+
+// ── UTILITÁRIOS ───────────────────────────────────────────────────────────────
+const priceLabel=(p,t)=>{
+  const r=REF[t];
+  if(!p)return{color:"#64748b",label:"Aguardando"};
+  if(p<=r.fire)return{color:"#22c55e",label:"🔥 Promoção!"};
+  if(p<=r.good)return{color:"#86efac",label:"✅ Boa oferta"};
+  if(p<=r.avg) return{color:"#f59e0b",label:"😐 Normal"};
+  return{color:"#ef4444",label:"😬 Caro"};
+};
+const Gauge=({value,min,max,fire,good,label})=>{
+  const pct=value?Math.min(100,Math.max(0,((value-min)/(max-min))*100)):0;
+  const col=value<=fire?"#22c55e":value<=good?"#f59e0b":"#ef4444";
+  return(
+    <div style={{marginTop:6}}>
+      <div style={{position:"relative",height:8,background:"#1e293b",borderRadius:4,overflow:"hidden"}}>
+        <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${(fire-min)/(max-min)*100}%`,background:"#22c55e22",borderRight:"1px solid #22c55e44"}}/>
+        <div style={{position:"absolute",left:`${(fire-min)/(max-min)*100}%`,top:0,height:"100%",width:`${(good-fire)/(max-min)*100}%`,background:"#f59e0b22",borderRight:"1px solid #f59e0b44"}}/>
+        {value>0&&<div style={{position:"absolute",left:`${pct}%`,top:-2,width:12,height:12,borderRadius:"50%",background:col,border:"2px solid #060d1a",transform:"translateX(-50%)",boxShadow:`0 0 8px ${col}`}}/>}
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:9,color:"#475569"}}>
+        <span>{fmtK(min)}</span><span style={{color:"#22c55e"}}>🔥{fmtK(fire)}</span><span style={{color:"#f59e0b"}}>{fmtK(good)}</span><span>{fmtK(max)}</span>
+      </div>
+    </div>
+  );
+};
+const Tip=({active,payload,label})=>active&&payload?.length?(
+  <div style={{background:"#0f1f38",border:"1px solid #1e3a5f",borderRadius:12,padding:"10px 14px",fontSize:12,boxShadow:"0 8px 32px #00000088"}}>
+    <p style={{color:"#64748b",fontWeight:700,marginBottom:6}}>{label}</p>
+    {payload.map((p,i)=><p key={i} style={{color:p.color,fontWeight:600,margin:"2px 0"}}>{p.name}: {fmt(p.value)}</p>)}
+  </div>
+):null;
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+const TABS=[
+  {id:"home",   icon:"🏠", label:"Início"},
+  {id:"hist",   icon:"📈", label:"Histórico"},
+  {id:"cias",   icon:"✈️", label:"Cias"},
+  {id:"rotas",  icon:"🗺️", label:"Rotas"},
+  {id:"dicas",  icon:"💡", label:"Dicas"},
+];
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function Home({rows,onRefresh,loading,lastUpdate}){
+  const latest=rows[rows.length-1];
+  const prev=rows[rows.length-2];
+  const bestEver=rows.length?Math.min(...rows.map(r=>r.econ).filter(Boolean)):0;
+  const alerts=rows.filter(r=>String(r.alerta).toUpperCase()==="SIM");
+  const econLabel=priceLabel(latest?.econ,"econ");
+  const execLabel=priceLabel(latest?.exec,"exec");
+  const econDelta=latest&&prev&&latest.econ&&prev.econ?latest.econ-prev.econ:null;
+
+  return(
+    <div className="fade-in">
+      {/* Status bar */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,padding:"10px 14px",background:"#0a1628",borderRadius:14,border:"1px solid #1e293b"}}>
+        <div>
+          <div style={{fontSize:10,color:"#475569",fontWeight:700,textTransform:"uppercase",letterSpacing:.8}}>Sistema</div>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2}}>
+            <div className={rows.length?"pulse":""} style={{width:7,height:7,borderRadius:"50%",background:rows.length?"#22c55e":"#f59e0b",boxShadow:rows.length?"0 0 8px #22c55e":""}}/>
+            <span style={{fontSize:12,color:rows.length?"#86efac":"#f59e0b",fontWeight:700}}>{loading?"Atualizando...":rows.length?"Monitorando":"Carregando"}</span>
+          </div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div style={{fontSize:10,color:"#475569"}}>Última busca</div>
+          <div style={{fontSize:11,color:"#64748b",marginTop:1}}>{lastUpdate}</div>
+        </div>
+        <button onClick={onRefresh} style={{background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"8px 12px",color:"#94a3b8",fontSize:13,cursor:"pointer"}}>🔄</button>
+      </div>
+
+      {/* Alert banner */}
+      {alerts.length>0&&(
+        <div style={{background:"linear-gradient(135deg,#14532d,#166534)",border:"1px solid #22c55e44",borderRadius:16,padding:"14px 16px",marginBottom:14}}>
+          <div style={{fontSize:12,color:"#86efac",fontWeight:700,marginBottom:4}}>🔥 {alerts.length} oferta{alerts.length>1?"s":""} detectada{alerts.length>1?"s":""}!</div>
+          <div style={{fontSize:13,color:"#4ade80"}}>WhatsApp enviado em {alerts[alerts.length-1].date}</div>
+        </div>
+      )}
+
+      {/* Preço atual */}
+      {latest&&(
+        <>
+          <div className="card" style={{marginBottom:12}}>
+            <div style={{fontSize:11,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:.8,marginBottom:12}}>Econômica — Melhor preço hoje</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end"}}>
+              <div>
+                <div style={{fontSize:32,fontWeight:900,color:econLabel.color,letterSpacing:-1}}>{fmt(latest.econ)}</div>
+                <div style={{fontSize:11,color:"#64748b",marginTop:2}}>por pessoa • {latest.cia}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <span className="tag" style={{background:econLabel.color+"22",color:econLabel.color}}>{econLabel.label}</span>
+                {econDelta!==null&&<div style={{fontSize:11,color:econDelta<0?"#22c55e":"#ef4444",marginTop:6}}>
+                  {econDelta<0?"▼":"▲"} {fmt(Math.abs(econDelta))} vs ontem
+                </div>}
+              </div>
+            </div>
+            <Gauge value={latest.econ} min={2000} max={7000} fire={REF.econ.fire} good={REF.econ.good}/>
+          </div>
+
+          <div className="card" style={{marginBottom:12}}>
+            <div style={{fontSize:11,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:.8,marginBottom:12}}>Executiva — Melhor preço hoje</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end"}}>
+              <div>
+                <div style={{fontSize:32,fontWeight:900,color:execLabel.color,letterSpacing:-1}}>{fmt(latest.exec)}</div>
+                <div style={{fontSize:11,color:"#64748b",marginTop:2}}>por pessoa • {latest.cia}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <span className="tag" style={{background:execLabel.color+"22",color:execLabel.color}}>{execLabel.label}</span>
+              </div>
+            </div>
+            <Gauge value={latest.exec} min={5000} max={22000} fire={REF.exec.fire} good={REF.exec.good}/>
+          </div>
+        </>
+      )}
+
+      {/* KPIs */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+        {[
+          {emoji:"🏆",label:"Recorde histórico",value:fmt(bestEver),sub:"menor econômica"},
+          {emoji:"🔔",label:"Alertas enviados",value:alerts.length,sub:"via WhatsApp"},
+          {emoji:"📊",label:"Dias monitorados",value:rows.length,sub:"registros no histórico"},
+          {emoji:"📅",label:"Faltam para comprar",value:"~2 meses",sub:"janela ideal: ago/2026"},
+        ].map((k,i)=>(
+          <div key={i} className="card" style={{padding:"14px 14px"}}>
+            <div style={{fontSize:22,marginBottom:6}}>{k.emoji}</div>
+            <div style={{fontSize:10,color:"#475569",fontWeight:700,textTransform:"uppercase",letterSpacing:.5,marginBottom:2}}>{k.label}</div>
+            <div style={{fontSize:20,fontWeight:800,color:"#e2e8f0"}}>{k.value}</div>
+            <div style={{fontSize:10,color:"#64748b",marginTop:2}}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mini chart */}
+      {rows.length>1&&(
+        <div className="card">
+          <div style={{fontSize:12,fontWeight:700,color:"#94a3b8",marginBottom:12}}>Econômica — últimos {rows.length} dias</div>
+          <ResponsiveContainer width="100%" height={130}>
+            <LineChart data={rows} margin={{top:4,right:4,bottom:0,left:0}}>
+              <XAxis dataKey="date" tick={{fontSize:8,fill:"#475569"}} axisLine={false} tickLine={false} interval="preserveStartEnd"/>
+              <YAxis tick={{fontSize:8,fill:"#475569"}} axisLine={false} tickLine={false} tickFormatter={v=>`R$${(v/1000).toFixed(0)}k`}/>
+              <Tooltip content={<Tip/>}/>
+              <ReferenceLine y={REF.econ.fire} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={.6}/>
+              <Line type="monotone" dataKey="econ" stroke="#38bdf8" strokeWidth={2} dot={(p)=>{
+                const r=rows[p.index];
+                const isDeal=String(r?.oferta||"").toUpperCase()==="SIM";
+                return<circle key={p.index} cx={p.cx} cy={p.cy} r={isDeal?6:3} fill={isDeal?"#22c55e":"#38bdf8"} stroke={isDeal?"#166534":"none"} strokeWidth={2}/>;
+              }} name="Econômica"/>
+            </LineChart>
+          </ResponsiveContainer>
+          <div style={{fontSize:10,color:"#475569",marginTop:6}}>● verde = oferta detectada • linha = gatilho de alerta</div>
+        </div>
+      )}
+
+      {!rows.length&&!loading&&(
+        <div className="card" style={{textAlign:"center",padding:40}}>
+          <div style={{fontSize:40,marginBottom:12}}>⏳</div>
+          <div style={{fontSize:14,color:"#64748b"}}>Passagens para Maio 2027 ainda não abertas para venda. O sistema monitora todo dia às 8h e avisa quando abrirem!</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── HISTÓRICO ─────────────────────────────────────────────────────────────────
+function Historico({rows}){
+  const[mode,setMode]=useState("econ");
+  const sortedDesc=[...rows].reverse();
+  const best=mode==="econ"?Math.min(...rows.map(r=>r.econ).filter(Boolean)):Math.min(...rows.map(r=>r.exec).filter(Boolean));
+  const worst=mode==="econ"?Math.max(...rows.map(r=>r.econ).filter(Boolean)):Math.max(...rows.map(r=>r.exec).filter(Boolean));
+
+  return(
+    <div className="fade-in">
+      {/* Toggle */}
+      <div style={{display:"flex",background:"#0a1628",border:"1px solid #1e293b",borderRadius:14,padding:4,marginBottom:14,gap:4}}>
+        {[["econ","✈️ Econômica"],["exec","🛋️ Executiva"]].map(([v,l])=>(
+          <button key={v} onClick={()=>setMode(v)} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:mode===v?"#1e3a5f":"transparent",color:mode===v?"#38bdf8":"#64748b",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>{l}</button>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <span style={{fontSize:13,fontWeight:700,color:"#94a3b8"}}>Evolução de preços</span>
+          <div style={{fontSize:11,color:"#475569"}}>{rows.length} dias</div>
+        </div>
+        <ResponsiveContainer width="100%" height={180}>
+          <LineChart data={rows} margin={{top:4,right:4,bottom:0,left:0}}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#0f1f38"/>
+            <XAxis dataKey="date" tick={{fontSize:8,fill:"#475569"}} axisLine={false} tickLine={false} interval="preserveStartEnd"/>
+            <YAxis tick={{fontSize:8,fill:"#475569"}} axisLine={false} tickLine={false} tickFormatter={v=>`R$${(v/1000).toFixed(0)}k`}/>
+            <Tooltip content={<Tip/>}/>
+            <ReferenceLine y={mode==="econ"?REF.econ.fire:REF.exec.fire} stroke="#22c55e" strokeDasharray="4 4" label={{value:"🔥",fontSize:10,position:"right"}}/>
+            <ReferenceLine y={mode==="econ"?REF.econ.good:REF.exec.good} stroke="#f59e0b" strokeDasharray="4 4"/>
+            <Line type="monotone" dataKey={mode} stroke={mode==="econ"?"#38bdf8":"#a78bfa"} strokeWidth={2.5}
+              dot={(p)=>{const r=rows[p.index];const isDeal=String(r?.oferta||"").toUpperCase()==="SIM";return<circle key={p.index} cx={p.cx} cy={p.cy} r={isDeal?7:3} fill={isDeal?"#22c55e":mode==="econ"?"#38bdf8":"#a78bfa"} stroke={isDeal?"#166534":"none"} strokeWidth={2}/>;}}
+              name={mode==="econ"?"Econômica":"Executiva"}/>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Stats rápidos */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}}>
+        {[
+          {label:"Menor",value:fmt(best),color:"#22c55e"},
+          {label:"Maior",value:fmt(worst),color:"#ef4444"},
+          {label:"Média",value:fmt(Math.round(rows.reduce((a,r)=>a+(r[mode]||0),0)/rows.filter(r=>r[mode]).length)),color:"#f59e0b"},
+        ].map((s,i)=>(
+          <div key={i} style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:12,padding:"10px 12px",textAlign:"center"}}>
+            <div style={{fontSize:10,color:"#475569",fontWeight:700,textTransform:"uppercase",marginBottom:4}}>{s.label}</div>
+            <div style={{fontSize:13,fontWeight:800,color:s.color}}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabela */}
+      <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <div style={{padding:"12px 14px",background:"#060d1a",borderBottom:"1px solid #1e293b"}}>
+          <div style={{display:"grid",gridTemplateColumns:"80px 1fr 90px 50px",fontSize:10,color:"#475569",fontWeight:700,textTransform:"uppercase",gap:6}}>
+            <span>Data</span><span>Preço/pessoa</span><span>Cia</span><span>🔥</span>
+          </div>
+        </div>
+        {sortedDesc.map((r,i)=>{
+          const p=r[mode]||0;
+          const isDeal=String(r.oferta||"").toUpperCase()==="SIM";
+          const isBest=p===best&&p>0;
+          return(
+            <div key={i} style={{display:"grid",gridTemplateColumns:"80px 1fr 90px 50px",padding:"11px 14px",borderBottom:"1px solid #0a1628",background:isDeal?"#14532d18":isBest?"#1e3a5f18":i%2===0?"transparent":"#060d1a",gap:6,alignItems:"center"}}>
+              <span style={{fontSize:11,color:"#64748b"}}>{r.date}</span>
+              <span style={{fontSize:14,fontWeight:800,color:p?priceLabel(p,mode).color:"#334155"}}>{fmt(p)||"—"}</span>
+              <span style={{fontSize:11,color:"#94a3b8",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.cia}</span>
+              <span style={{fontSize:14,textAlign:"center"}}>{isDeal?"🔥":isBest?"⭐":"—"}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── CIAS ──────────────────────────────────────────────────────────────────────
+function Cias({rows}){
+  const bycia=useMemo(()=>{
+    const m={};
+    rows.forEach(r=>{
+      if(!r.cia||r.cia==="—")return;
+      const k=r.cia;
+      if(!m[k])m[k]={cia:k,prices:[],exec:[],deals:0};
+      if(r.econ>0)m[k].prices.push(r.econ);
+      if(r.exec>0)m[k].exec.push(r.exec);
+      if(String(r.oferta||"").toUpperCase()==="SIM")m[k].deals++;
+    });
+    return Object.values(m).map(c=>({
+      cia:c.cia,
+      minEcon:c.prices.length?Math.min(...c.prices):0,
+      avgEcon:c.prices.length?Math.round(c.prices.reduce((a,b)=>a+b,0)/c.prices.length):0,
+      minExec:c.exec.length?Math.min(...c.exec):0,
+      deals:c.deals,
+      aparicoes:c.prices.length,
+    })).sort((a,b)=>a.minEcon-b.minEcon);
+  },[rows]);
+
+  const chartData=bycia.filter(c=>c.minEcon>0).slice(0,6);
+
+  return(
+    <div className="fade-in">
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#94a3b8",marginBottom:12}}>Menor preço econômica por cia</div>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={chartData} margin={{top:4,right:4,bottom:20,left:0}} layout="vertical">
+            <XAxis type="number" tick={{fontSize:8,fill:"#475569"}} axisLine={false} tickLine={false} tickFormatter={v=>`R$${(v/1000).toFixed(0)}k`}/>
+            <YAxis type="category" dataKey="cia" tick={{fontSize:10,fill:"#94a3b8"}} axisLine={false} tickLine={false} width={70}/>
+            <Tooltip formatter={(v)=>[fmt(v),"Menor preço"]} contentStyle={{background:"#0f1f38",border:"1px solid #1e3a5f",borderRadius:10,fontSize:12}}/>
+            <ReferenceLine x={REF.econ.fire} stroke="#22c55e" strokeDasharray="3 3"/>
+            <Bar dataKey="minEcon" radius={[0,6,6,0]}>
+              {chartData.map((c,i)=><Cell key={i} fill={ciaColor(c.cia)}/>)}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {bycia.length>0?bycia.map((c,i)=>(
+        <div key={i} className="card" style={{marginBottom:10,padding:"14px 16px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:10,height:10,borderRadius:"50%",background:ciaColor(c.cia),flexShrink:0}}/>
+              <span style={{fontSize:15,fontWeight:800,color:"#e2e8f0"}}>{c.cia}</span>
+            </div>
+            {c.deals>0&&<span className="tag" style={{background:"#14532d",color:"#86efac"}}>🔥 {c.deals} oferta{c.deals>1?"s":""}</span>}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+            {[
+              {l:"Menor Econ.",v:fmt(c.minEcon),c:priceLabel(c.minEcon,"econ").color},
+              {l:"Média Econ.",v:fmt(c.avgEcon),c:"#94a3b8"},
+              {l:"Menor Exec.",v:c.minExec?fmt(c.minExec):"—",c:"#a78bfa"},
+            ].map((s,j)=>(
+              <div key={j} style={{background:"#060d1a",borderRadius:10,padding:"8px 10px"}}>
+                <div style={{fontSize:9,color:"#475569",fontWeight:700,textTransform:"uppercase",marginBottom:3}}>{s.l}</div>
+                <div style={{fontSize:12,fontWeight:800,color:s.c}}>{s.v}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:11,color:"#475569",marginTop:8}}>Apareceu como melhor preço em {c.aparicoes} dia{c.aparicoes!==1?"s":""}</div>
+        </div>
+      )):(
+        <div className="card" style={{textAlign:"center",padding:40}}>
+          <div style={{fontSize:36,marginBottom:12}}>✈️</div>
+          <div style={{fontSize:13,color:"#64748b"}}>Quando as passagens abrirem, aqui vai aparecer o comparativo por companhia aérea.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── ROTAS ─────────────────────────────────────────────────────────────────────
+function Rotas(){
+  return(
+    <div className="fade-in">
+      {/* Open Jaw highlight */}
+      <div style={{background:"linear-gradient(135deg,#1e3a5f,#0a2540)",border:"1px solid #38bdf844",borderRadius:18,padding:"20px 18px",marginBottom:14}}>
+        <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Estratégia recomendada</div>
+        <div style={{fontSize:22,fontWeight:900,color:"#f0f9ff",marginBottom:12}}>Open Jaw</div>
+        <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+          {[["✈️ Ida","GRU → MCO","Chegada em Orlando — perto dos parques"],["🎢","Orlando","Disney, Universal, Kennedy Space Center"],["🚗","MCO → MIA","Carro alugado ~4h pela US-1"],["🏖️","Miami + Keys","South Beach, Wynwood, Key West"],["✈️ Volta","MIA → GRU","Retorno de Miami — sem perder tempo"]].map(([icon,title,sub],i)=>(
+            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10}}>
+              <div style={{fontSize:18,width:28,flexShrink:0,textAlign:"center"}}>{icon}</div>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{title}</div>
+                <div style={{fontSize:11,color:"#64748b"}}>{sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#0a1628",borderRadius:12,padding:"12px 14px"}}>
+          <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,marginBottom:4}}>💡 Por que Open Jaw?</div>
+          <div style={{fontSize:12,color:"#94a3b8",lineHeight:1.6}}>Você economiza o trajeto de volta Orlando→Miami (4h de carro ou ~R$400 de voo doméstico) e ainda paga a mesma tarifa de um roundtrip normal.</div>
+        </div>
+      </div>
+
+      {/* Comparativo MCO vs MIA */}
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#94a3b8",marginBottom:14}}>MCO vs MIA — qual é mais barato?</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+          {[
+            {cod:"MCO",nome:"Orlando",flag:"🎢",preco:"R$ 4.200 – 5.800",via:"Direto ou 1 conexão",melhor:"LATAM, American",tip:"Entrada ideal — perto dos parques"},
+            {cod:"MIA",nome:"Miami",flag:"🌴",preco:"R$ 3.900 – 5.400",via:"Direto ou 1 conexão",melhor:"LATAM, American",tip:"Às vezes 10-15% mais barato que MCO"},
+          ].map((r,i)=>(
+            <div key={i} style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:14,padding:"14px 12px"}}>
+              <div style={{fontSize:24,marginBottom:6}}>{r.flag}</div>
+              <div style={{fontSize:14,fontWeight:800,color:"#e2e8f0"}}>{r.nome}</div>
+              <div style={{fontSize:10,color:"#475569",marginBottom:8}}>{r.cod}</div>
+              <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,marginBottom:4}}>Faixa média</div>
+              <div style={{fontSize:12,color:"#e2e8f0",fontWeight:700,marginBottom:8}}>{r.preco}</div>
+              <div style={{fontSize:10,color:"#64748b",lineHeight:1.5}}>{r.tip}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#0a1628",borderRadius:12,padding:"12px 14px",border:"1px solid #f59e0b44"}}>
+          <div style={{fontSize:11,color:"#f59e0b",fontWeight:700,marginBottom:4}}>⚠️ Dica importante</div>
+          <div style={{fontSize:12,color:"#94a3b8",lineHeight:1.6}}>Sempre pesquise os dois aeroportos. A diferença pode chegar a <strong style={{color:"#e2e8f0"}}>R$ 800–1.200 por pessoa</strong>. Com 2 adultos, são até R$ 2.400 de economia.</div>
+        </div>
+      </div>
+
+      {/* Ida e volta mesmo aeroporto */}
+      <div className="card">
+        <div style={{fontSize:13,fontWeight:700,color:"#94a3b8",marginBottom:12}}>E a ida e volta pelo mesmo aeroporto?</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          {[
+            {tipo:"Só MCO",rota:"GRU→MCO e MCO→GRU",pros:["Mais simples de organizar","Sem deslocamento entre cidades"],cons:["Perde os dias de Miami e Keys na volta","Carro de ida e volta obrigatório"]},
+            {tipo:"Só MIA",rota:"GRU→MIA e MIA→GRU",pros:["Pode ser mais barato","Ótimo se foco for Miami"],cons:["Precisa ir até Orlando de carro","Mais km no roteiro"]},
+          ].map((op,i)=>(
+            <div key={i} style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:14,padding:"12px"}}>
+              <div style={{fontSize:13,fontWeight:800,color:"#e2e8f0",marginBottom:3}}>{op.tipo}</div>
+              <div style={{fontSize:10,color:"#475569",marginBottom:10}}>{op.rota}</div>
+              {op.pros.map((p,j)=><div key={j} style={{fontSize:11,color:"#86efac",marginBottom:3}}>✓ {p}</div>)}
+              {op.cons.map((c,j)=><div key={j} style={{fontSize:11,color:"#f87171",marginTop:3}}>✗ {c}</div>)}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── DICAS ─────────────────────────────────────────────────────────────────────
+function Dicas(){
+  const[open,setOpen]=useState(null);
+  return(
+    <div className="fade-in">
+      {/* Cronograma */}
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#94a3b8",marginBottom:14}}>📅 Quando comprar</div>
+        <div style={{position:"relative",paddingLeft:20}}>
+          <div style={{position:"absolute",left:7,top:0,bottom:0,width:2,background:"linear-gradient(#22c55e,#ef4444)"}}/>
+          {MESES.map((m,i)=>{
+            const cols={wait:"#475569",start:"#38bdf8",buy:"#22c55e",ok:"#f59e0b",warn:"#f97316",danger:"#ef4444"};
+            const c=cols[m.status];
+            return(
+              <div key={i} style={{position:"relative",marginBottom:14}}>
+                <div style={{position:"absolute",left:-16,top:3,width:10,height:10,borderRadius:"50%",background:c,border:"2px solid #060d1a"}}/>
+                <div style={{fontSize:11,color:c,fontWeight:700,marginBottom:2}}>{m.mes}</div>
+                <div style={{fontSize:12,color:"#94a3b8",lineHeight:1.4}}>{m.acao}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Faixas de referência */}
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#94a3b8",marginBottom:14}}>💰 Tabela de referência de preços</div>
+        <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,marginBottom:8}}>Classe Econômica (por pessoa)</div>
+        {REFS_ECON.map((r,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 10px",background:i%2===0?"#060d1a":"transparent",borderRadius:8,marginBottom:4}}>
+            <div>
+              <span className="tag" style={{background:r.color+"22",color:r.color,marginRight:8}}>{r.label}</span>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#e2e8f0"}}>{r.range}</div>
+              <div style={{fontSize:10,color:"#64748b"}}>{r.tip}</div>
+            </div>
+          </div>
+        ))}
+        <div style={{fontSize:11,color:"#a78bfa",fontWeight:700,margin:"14px 0 8px"}}>Classe Executiva (por pessoa)</div>
+        {REFS_EXEC.map((r,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 10px",background:i%2===0?"#060d1a":"transparent",borderRadius:8,marginBottom:4}}>
+            <span className="tag" style={{background:r.color+"22",color:r.color}}>{r.label}</span>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#e2e8f0"}}>{r.range}</div>
+              <div style={{fontSize:10,color:"#64748b"}}>{r.tip}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dicas expansíveis */}
+      <div style={{fontSize:12,fontWeight:700,color:"#64748b",marginBottom:10,textTransform:"uppercase",letterSpacing:.8}}>Estratégias de compra</div>
+      {DICAS.map((d,i)=>(
+        <div key={i} onClick={()=>setOpen(open===i?null:i)}
+          style={{background:open===i?"linear-gradient(135deg,#0f1f38,#0a1628)":"#0a1628",border:`1px solid ${open===i?"#1e3a5f":"#1e293b"}`,borderRadius:14,padding:"14px 16px",marginBottom:8,cursor:"pointer",transition:"all .2s"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:20}}>{d.emoji}</span>
+              <span style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{d.titulo}</span>
+            </div>
+            <span style={{fontSize:14,color:"#475569",transition:"transform .2s",transform:open===i?"rotate(180deg)":"rotate(0)"}}>▾</span>
+          </div>
+          {open===i&&(
+            <div style={{marginTop:12,fontSize:13,color:"#94a3b8",lineHeight:1.7,borderTop:"1px solid #1e293b",paddingTop:12}}>
+              {d.corpo}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── APP SHELL ─────────────────────────────────────────────────────────────────
+function App(){
+  const[tab,setTab]=useState("home");
+  const[rows,setRows]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[lastUpdate,setLastUpdate]=useState("—");
+
+  const load=async()=>{
+    setLoading(true);
+    try{
+      const r=await fetch(SHEETS_URL);
+      const t=await r.text();
+      const lines=t.trim().split("\n").slice(4).filter(l=>l.trim());
+      const parsed=lines.map(l=>{
+        const c=l.split(",");
+        return{date:c[0]?.trim(),econ:parsePrice(c[1]),exec:parsePrice(c[2]),cia:c[3]?.trim()||"—",best:parsePrice(c[4]),queda:c[5]?.trim()||"",oferta:c[6]?.trim()||"NÃO",alerta:c[7]?.trim()||"NÃO",obs:c[8]?.trim()||""};
+      }).filter(r=>r.date&&r.econ>0);
+      setRows(parsed);
+      setLastUpdate(new Date().toLocaleString("pt-BR"));
+    }catch(e){console.error(e);}
+    setLoading(false);
+  };
+
+  useEffect(()=>{load();},[]);
+
+  const content={
+    home:<Home rows={rows} onRefresh={load} loading={loading} lastUpdate={lastUpdate}/>,
+    hist:<Historico rows={rows}/>,
+    cias:<Cias rows={rows}/>,
+    rotas:<Rotas/>,
+    dicas:<Dicas/>,
+  };
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",maxWidth:500,margin:"0 auto"}}>
+      {/* Header */}
+      <div style={{background:"linear-gradient(135deg,#060d1a 0%,#0a1628 50%,#060d1a 100%)",padding:"env(safe-area-inset-top,16px) 16px 0",borderBottom:"1px solid #0f1f38",position:"sticky",top:0,zIndex:20}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:12}}>
+          <div>
+            <div style={{fontSize:10,color:"#38bdf8",fontWeight:700,letterSpacing:1.5,textTransform:"uppercase"}}>Monitor Automático</div>
+            <div style={{fontSize:20,fontWeight:900,color:"#f0f9ff",letterSpacing:-.5,marginTop:1}}>🌴 Flórida 2027</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:10,color:"#334155"}}>GRU→MCO | MIA→GRU</div>
+            <div style={{fontSize:10,color:"#334155",marginTop:1}}>2 adultos + Luca</div>
+          </div>
+        </div>
+        {/* Tab bar */}
+        <div style={{display:"flex",borderTop:"1px solid #0f1f38"}}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",borderBottom:tab===t.id?"2px solid #38bdf8":"2px solid transparent",transition:"all .15s"}}>
+              <div style={{fontSize:18,marginBottom:2}}>{t.icon}</div>
+              <div style={{fontSize:9,fontWeight:700,color:tab===t.id?"#38bdf8":"#475569",textTransform:"uppercase",letterSpacing:.5}}>{t.label}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{flex:1,padding:"16px 14px",paddingBottom:"calc(16px + env(safe-area-inset-bottom,0px))",overflowY:"auto"}}>
+        {content[tab]}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
