@@ -1,245 +1,180 @@
 """
-Monitor de Passagens - Florida 2027
-Roda todo dia via GitHub Actions às 8h (horário de Brasília)
-Busca preços, salva no Google Sheets e avisa no WhatsApp se achar oferta.
+Monitor de Passagens - Florida Maio 2027
+Roda todo dia às 8h via GitHub Actions.
+Usa SerpAPI (Google Flights) para buscar preços reais.
+Salva no Google Sheets via Apps Script Webhook.
+Manda WhatsApp via CallMeBot se achar oferta.
 """
 
-import os, requests, json, gspread
+import os, requests
 from datetime import datetime
-from google.oauth2.service_account import Credentials
-from amadeus import Client, ResponseError
 
-# ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
-ROTA_IDA    = ("GRU", "MCO")   # Guarulhos → Orlando
-ROTA_VOLTA  = ("MIA", "GRU")   # Miami → Guarulhos
-MES_VIAGEM  = "2027-05"
-ADULTOS     = 2
-CRIANCAS    = 1
+# ── SECRETS (configurados no GitHub → Settings → Secrets) ────────────────────
+SERPAPI_KEY      = os.environ["SERPAPI_KEY"]
+CALLMEBOT_PHONE  = os.environ["CALLMEBOT_PHONE"]   # ex: +5511999999999
+CALLMEBOT_APIKEY = os.environ["CALLMEBOT_APIKEY"]
+SHEETS_WEBHOOK   = os.environ["SHEETS_WEBHOOK"]     # URL do Apps Script
 
-ALERTA_ECON_MAX = 3500   # R$ — abaixo disso manda WhatsApp imediato
-ALERTA_EXEC_MAX = 9000   # R$ — abaixo disso manda WhatsApp imediato
-BOM_PRECO_ECON  = 4500   # R$ — abaixo disso registra como bom preço
-BOM_PRECO_EXEC  = 13000  # R$ — abaixo disso registra como bom preço
-QUEDA_ALERTA    = 20     # % de queda vs média histórica para alertar
+# ── CONFIGURAÇÃO DA VIAGEM ────────────────────────────────────────────────────
+ROTAS = [
+    {"dep": "GRU", "arr": "MCO"},  # Guarulhos → Orlando
+    {"dep": "GRU", "arr": "MIA"},  # Guarulhos → Miami
+]
+DATAS_IDA   = ["2027-05-01", "2027-05-06", "2027-05-10"]
+DATAS_VOLTA = ["2027-05-16", "2027-05-18", "2027-05-20"]
+ADULTOS  = 2
+CRIANCAS = 1
 
-CIA_EXCLUIDA    = ["AD"]  # Código IATA da Azul — excluída das buscas
+# ── LIMITES DE ALERTA ─────────────────────────────────────────────────────────
+ALERTA_ECON = 3500   # Abaixo disso → WhatsApp imediato
+ALERTA_EXEC = 9000
+BOM_ECON    = 4500   # Abaixo disso → registrar como bom
+BOM_EXEC    = 13000
+CIA_EXCLUIR = ["Azul"]
 
-# Secrets (configurados no GitHub → Settings → Secrets)
-AMADEUS_KEY    = os.environ["AMADEUS_API_KEY"]
-AMADEUS_SECRET = os.environ["AMADEUS_API_SECRET"]
-CALLMEBOT_PHONE = os.environ["CALLMEBOT_PHONE"]   # ex: +5511999999999
-CALLMEBOT_KEY   = os.environ["CALLMEBOT_APIKEY"]
-SHEETS_ID       = os.environ["SHEETS_ID"]          # ID da sua planilha
-GOOGLE_CREDS    = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-
-USD_BRL = 5.10  # Taxa de conversão USD → BRL (atualizada manualmente ou via API)
-
-# ── FUNÇÃO: BUSCAR PREÇOS AMADEUS ────────────────────────────────────────────
+# ── BUSCA DE PREÇOS VIA SERPAPI ───────────────────────────────────────────────
 def buscar_precos():
-    amadeus = Client(client_id=AMADEUS_KEY, client_secret=AMADEUS_SECRET)
-    
-    melhores = {"econ": None, "exec": None, "cia_econ": None, "cia_exec": None}
-    
-    # Datas para testar (primeiros 20 dias de Maio 2027)
-    datas_ida    = ["2027-05-01", "2027-05-03", "2027-05-06", "2027-05-10"]
-    datas_volta  = ["2027-05-15", "2027-05-18", "2027-05-20"]
+    melhor_econ = {"preco": None, "cia": None, "rota": None}
+    melhor_exec = {"preco": None, "cia": None, "rota": None}
 
-    for data_ida in datas_ida:
-        for data_volta in datas_volta:
-            try:
-                response = amadeus.shopping.flight_offers_search.get(
-                    originLocationCode=ROTA_IDA[0],
-                    destinationLocationCode=ROTA_IDA[1],
-                    departureDate=data_ida,
-                    returnDate=data_volta,
-                    adults=ADULTOS,
-                    children=CRIANCAS,
-                    currencyCode="BRL",
-                    max=10,
-                )
+    for rota in ROTAS:
+        for data_ida in DATAS_IDA:
+            for data_volta in DATAS_VOLTA:
+                params = {
+                    "engine":        "google_flights",
+                    "departure_id":  rota["dep"],
+                    "arrival_id":    rota["arr"],
+                    "outbound_date": data_ida,
+                    "return_date":   data_volta,
+                    "adults":        ADULTOS,
+                    "children":      CRIANCAS,
+                    "currency":      "BRL",
+                    "hl":            "pt",
+                    "api_key":       SERPAPI_KEY,
+                    "type":          "1",  # ida e volta
+                }
 
-                for oferta in response.data:
-                    cia_code = oferta["validatingAirlineCodes"][0] if oferta.get("validatingAirlineCodes") else ""
-                    if cia_code in CIA_EXCLUIDA:
+                try:
+                    resp = requests.get("https://serpapi.com/search", params=params, timeout=30)
+                    data = resp.json()
+                except Exception as e:
+                    print(f"Erro SerpAPI ({rota['dep']}→{rota['arr']} {data_ida}): {e}")
+                    continue
+
+                # Percorre best_flights e other_flights
+                todos = data.get("best_flights", []) + data.get("other_flights", [])
+
+                for voo in todos:
+                    preco = voo.get("price")
+                    if not preco:
                         continue
 
-                    preco_total = float(oferta["price"]["grandTotal"])
-                    preco_por_pessoa = preco_total / (ADULTOS + CRIANCAS)
+                    preco_pp = preco / (ADULTOS + CRIANCAS)
 
-                    # Detectar classe predominante
-                    classes = []
-                    for itin in oferta.get("itineraries", []):
-                        for seg in itin.get("segments", []):
-                            for traveler in oferta.get("travelerPricings", []):
-                                for detail in traveler.get("fareDetailsBySegment", []):
-                                    if detail.get("segmentId") == seg.get("id"):
-                                        classes.append(detail.get("cabin", "ECONOMY"))
+                    # Nome da cia
+                    flights = voo.get("flights", [])
+                    cia = flights[0].get("airline", "—") if flights else "—"
 
-                    classe_principal = max(set(classes), key=classes.count) if classes else "ECONOMY"
-                    eh_exec = classe_principal in ("BUSINESS", "FIRST")
-                    
-                    # Nome da cia para exibição
-                    cias_nomes = {
-                        "LA": "LATAM", "JJ": "LATAM", "AA": "American",
-                        "CM": "Copa", "TP": "TAP", "UA": "United",
-                        "DL": "Delta", "G3": "Gol", "IB": "Iberia",
-                    }
-                    cia_nome = cias_nomes.get(cia_code, cia_code)
+                    if any(exc.lower() in cia.lower() for exc in CIA_EXCLUIR):
+                        continue
+
+                    # Detectar classe
+                    travel_class = flights[0].get("travel_class", "Economy") if flights else "Economy"
+                    eh_exec = "business" in travel_class.lower() or "first" in travel_class.lower()
+
+                    nome_rota = f"{rota['dep']}→{rota['arr']}"
 
                     if eh_exec:
-                        if melhores["exec"] is None or preco_por_pessoa < melhores["exec"]:
-                            melhores["exec"]     = preco_por_pessoa
-                            melhores["cia_exec"] = cia_nome
+                        if melhor_exec["preco"] is None or preco_pp < melhor_exec["preco"]:
+                            melhor_exec = {"preco": round(preco_pp), "cia": cia, "rota": nome_rota}
                     else:
-                        if melhores["econ"] is None or preco_por_pessoa < melhores["econ"]:
-                            melhores["econ"]     = preco_por_pessoa
-                            melhores["cia_econ"] = cia_nome
+                        if melhor_econ["preco"] is None or preco_pp < melhor_econ["preco"]:
+                            melhor_econ = {"preco": round(preco_pp), "cia": cia, "rota": nome_rota}
 
-            except ResponseError as e:
-                print(f"Erro Amadeus ({data_ida}→{data_volta}): {e}")
-                continue
+    return melhor_econ, melhor_exec
 
-    return melhores
 
-# ── FUNÇÃO: LER HISTÓRICO DO SHEETS ─────────────────────────────────────────
-def ler_historico(worksheet):
-    rows = worksheet.get_all_values()
-    precos_econ = []
-    # Pular linha de título (1), subtítulo (2), vazia (3), cabeçalho (4) → dados a partir da linha 5
-    for row in rows[4:]:
-        if len(row) >= 2 and row[1]:
-            try:
-                val = float(str(row[1]).replace("R$", "").replace(".", "").replace(",", ".").strip())
-                if val > 0:
-                    precos_econ.append(val)
-            except:
-                pass
-    return precos_econ
+# ── SALVAR NO GOOGLE SHEETS VIA WEBHOOK ──────────────────────────────────────
+def salvar_sheets(econ, exec_, eh_oferta, eh_alerta, queda, obs):
+    payload = {
+        "date":    datetime.now().strftime("%d/%m/%Y"),
+        "econ":    f"R$ {econ['preco']:,}".replace(",", ".") if econ["preco"] else "—",
+        "exec":    f"R$ {exec_['preco']:,}".replace(",", ".") if exec_["preco"] else "—",
+        "cia":     econ["cia"] or exec_["cia"] or "—",
+        "best":    f"R$ {min(filter(None,[econ['preco'],exec_['preco']])):,}".replace(",",".") if any([econ["preco"],exec_["preco"]]) else "—",
+        "queda":   queda,
+        "oferta":  "SIM" if eh_oferta else "NÃO",
+        "alerta":  "SIM" if eh_alerta else "NÃO",
+        "obs":     obs,
+    }
+    try:
+        r = requests.post(SHEETS_WEBHOOK, json=payload, timeout=15)
+        print(f"✅ Sheets: {r.text.strip()}")
+    except Exception as e:
+        print(f"⚠️ Erro ao salvar no Sheets: {e}")
 
-# ── FUNÇÃO: SALVAR NO SHEETS ─────────────────────────────────────────────────
-def salvar_sheets(precos, media_hist):
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds  = Credentials.from_service_account_info(GOOGLE_CREDS, scopes=scopes)
-    gc     = gspread.authorize(creds)
-    sh     = gc.open_by_key(SHEETS_ID)
-    ws     = sh.worksheet("Histórico")
 
-    econ = precos["econ"] or 0
-    exec_ = precos["exec"] or 0
-    cia   = precos["cia_econ"] or precos["cia_exec"] or "—"
-    best  = min(filter(None, [econ, exec_])) if any([econ, exec_]) else 0
-
-    queda = ""
-    if media_hist and econ > 0:
-        pct = round((media_hist - econ) / media_hist * 100)
-        queda = f"-{pct}%" if pct > 0 else f"+{abs(pct)}%"
-
-    eh_oferta  = (econ > 0 and econ <= ALERTA_ECON_MAX) or (exec_ > 0 and exec_ <= ALERTA_EXEC_MAX)
-    queda_ok   = media_hist and econ > 0 and ((media_hist - econ) / media_hist * 100) >= QUEDA_ALERTA
-    deve_alertar = eh_oferta or queda_ok
-
-    data_hoje = datetime.now().strftime("%d/%m/%Y")
-    obs = ""
-    if econ <= ALERTA_ECON_MAX and econ > 0:
-        obs = f"🔥 Econômica {cia} abaixo do alerta!"
-    elif exec_ <= ALERTA_EXEC_MAX and exec_ > 0:
-        obs = f"🔥 Executiva {cia} abaixo do alerta!"
-
-    nova_linha = [
-        data_hoje,
-        f"R$ {int(econ):,}".replace(",", ".") if econ else "—",
-        f"R$ {int(exec_):,}".replace(",", ".") if exec_ else "—",
-        cia,
-        f"R$ {int(best):,}".replace(",", ".") if best else "—",
-        queda,
-        "SIM" if eh_oferta else "NÃO",
-        "SIM" if deve_alertar else "NÃO",
-        obs,
-    ]
-
-    ws.append_row(nova_linha, value_input_option="USER_ENTERED")
-    print(f"✅ Salvo no Sheets: {nova_linha}")
-
-    # Salvar na aba Ofertas também
-    ws_ofertas = sh.worksheet("Ofertas")
-    ws_ofertas.append_row([
-        datetime.now().strftime("%d/%m %H:%M"),
-        cia,
-        "GRU→MCO / MIA→GRU",
-        "Econômica" if econ else "Executiva",
-        f"R$ {int(econ):,}".replace(",", ".") if econ else f"R$ {int(exec_):,}".replace(",", "."),
-        "—",
-        queda,
-        "✅ Inclusa",
-        "—",
-        "🔥 OFERTA" if eh_oferta else "✅ Registrado",
-    ], value_input_option="USER_ENTERED")
-
-    return deve_alertar, econ, exec_, cia, obs
-
-# ── FUNÇÃO: WHATSAPP ─────────────────────────────────────────────────────────
-def enviar_whatsapp(econ, exec_, cia, obs):
-    msg_parts = [f"🌴 *ALERTA PASSAGENS FLORIDA 2027*\n"]
-    if econ > 0:
-        msg_parts.append(f"✈️ Econômica: R$ {int(econ):,.0f}/pessoa ({cia})")
-    if exec_ > 0:
-        msg_parts.append(f"🛋️ Executiva: R$ {int(exec_):,.0f}/pessoa ({cia})")
-    msg_parts.append(f"\n{obs}")
-    msg_parts.append(f"\n📊 Ver histórico completo no portal!")
-    msg = "\n".join(msg_parts)
+# ── WHATSAPP VIA CALLMEBOT ────────────────────────────────────────────────────
+def enviar_whatsapp(econ, exec_, obs):
+    linhas = ["🌴 *ALERTA PASSAGENS FLORIDA 2027*", ""]
+    if econ["preco"]:
+        linhas.append(f"✈️ Econômica: *R$ {econ['preco']:,.0f}/pessoa*")
+        linhas.append(f"   {econ['cia']} | {econ['rota']}")
+    if exec_["preco"]:
+        linhas.append(f"🛋️ Executiva: *R$ {exec_['preco']:,.0f}/pessoa*")
+        linhas.append(f"   {exec_['cia']} | {exec_['rota']}")
+    linhas += ["", obs, "", "📊 Veja o histórico no seu portal!"]
+    msg = "\n".join(linhas)
 
     url = (
         f"https://api.callmebot.com/whatsapp.php"
         f"?phone={CALLMEBOT_PHONE}"
         f"&text={requests.utils.quote(msg)}"
-        f"&apikey={CALLMEBOT_KEY}"
+        f"&apikey={CALLMEBOT_APIKEY}"
     )
-    resp = requests.get(url, timeout=10)
-    if resp.status_code == 200:
-        print(f"✅ WhatsApp enviado para {CALLMEBOT_PHONE}")
-    else:
-        print(f"⚠️ Erro WhatsApp: {resp.status_code} — {resp.text}")
+    try:
+        r = requests.get(url, timeout=15)
+        print(f"✅ WhatsApp enviado! Status: {r.status_code}")
+    except Exception as e:
+        print(f"⚠️ Erro WhatsApp: {e}")
 
-    # Registrar na aba Alertas
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds  = Credentials.from_service_account_info(GOOGLE_CREDS, scopes=scopes)
-    gc     = gspread.authorize(creds)
-    sh     = gc.open_by_key(SHEETS_ID)
-    ws_alertas = sh.worksheet("Alertas WhatsApp")
-    ws_alertas.append_row([
-        datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "Econômica 🔥" if econ <= ALERTA_ECON_MAX else "Executiva 🔥",
-        msg.replace("\n", " "),
-        int(econ or exec_),
-        "✅ Enviado",
-    ], value_input_option="USER_ENTERED")
 
-# ── MAIN ─────────────────────────────────────────────────────────────────────
+# ── MAIN ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print(f"🔍 Iniciando busca — {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    print(f"\n🔍 Buscando passagens — {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    print("=" * 50)
 
-    # 1. Buscar preços
-    precos = buscar_precos()
-    print(f"💰 Melhor econômica: R$ {precos['econ']} ({precos['cia_econ']})")
-    print(f"🛋️  Melhor executiva: R$ {precos['exec']} ({precos['cia_exec']})")
+    econ, exec_ = buscar_precos()
 
-    # 2. Ler histórico para calcular média
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds  = Credentials.from_service_account_info(GOOGLE_CREDS, scopes=scopes)
-    gc     = gspread.authorize(creds)
-    sh     = gc.open_by_key(SHEETS_ID)
-    hist   = ler_historico(sh.worksheet("Histórico"))
-    media  = sum(hist) / len(hist) if hist else None
-    print(f"📊 Média histórica econômica: R$ {round(media) if media else '—'}")
+    print(f"✈️  Econômica: R$ {econ['preco']} ({econ['cia']}) [{econ['rota']}]")
+    print(f"🛋️  Executiva: R$ {exec_['preco']} ({exec_['cia']}) [{exec_['rota']}]")
 
-    # 3. Salvar no Sheets
-    deve_alertar, econ, exec_, cia, obs = salvar_sheets(precos, media)
+    # Avaliar se é oferta
+    eh_oferta_econ = econ["preco"] and econ["preco"] <= ALERTA_ECON
+    eh_oferta_exec = exec_["preco"] and exec_["preco"] <= ALERTA_EXEC
+    eh_oferta      = eh_oferta_econ or eh_oferta_exec
+    deve_alertar   = eh_oferta
 
-    # 4. Enviar WhatsApp se necessário
+    queda = ""
+    obs   = ""
+    if eh_oferta_econ:
+        obs = f"🔥 OFERTA! {econ['cia']} econômica R${econ['preco']}/pessoa!"
+    elif eh_oferta_exec:
+        obs = f"🔥 OFERTA! {exec_['cia']} executiva R${exec_['preco']}/pessoa!"
+    elif econ["preco"] and econ["preco"] <= BOM_ECON:
+        obs = f"✅ Bom preço econômica: {econ['cia']} R${econ['preco']}"
+    elif exec_["preco"] and exec_["preco"] <= BOM_EXEC:
+        obs = f"✅ Bom preço executiva: {exec_['cia']} R${exec_['preco']}"
+
+    # Salvar no Sheets
+    salvar_sheets(econ, exec_, eh_oferta, deve_alertar, queda, obs)
+
+    # WhatsApp se necessário
     if deve_alertar:
         print("🔔 OFERTA DETECTADA! Enviando WhatsApp...")
-        enviar_whatsapp(econ, exec_, cia, obs)
+        enviar_whatsapp(econ, exec_, obs)
     else:
-        print("😴 Sem ofertas hoje. Tudo salvo no Sheets.")
+        print("😴 Sem oferta hoje. Dados salvos no Sheets.")
 
-    print("✅ Concluído!")
+    print("=" * 50)
+    print("✅ Concluído!\n")

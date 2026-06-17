@@ -1,0 +1,34 @@
+name: Monitor Passagens Florida 2027
+
+on:
+  schedule:
+    # Todo dia às 11:00 UTC = 08:00 horário de Brasília (BRT = UTC-3)
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+    # Permite rodar manualmente pelo botão no GitHub (para testar)
+
+jobs:
+  buscar-passagens:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar monitor de passagens
+        env:
+          AMADEUS_API_KEY:      ${{ secrets.AMADEUS_API_KEY }}
+          AMADEUS_API_SECRET:   ${{ secrets.AMADEUS_API_SECRET }}
+          CALLMEBOT_PHONE:      ${{ secrets.CALLMEBOT_PHONE }}
+          CALLMEBOT_APIKEY:     ${{ secrets.CALLMEBOT_APIKEY }}
+          SHEETS_ID:            ${{ secrets.SHEETS_ID }}
+          GOOGLE_CREDENTIALS:   ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: python monitor.py

@@ -1,4 +1,1 @@
-amadeus==8.1.0
-gspread==6.1.2
-google-auth==2.29.0
 requests==2.32.3
