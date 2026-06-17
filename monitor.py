@@ -27,6 +27,7 @@ FL_ERRO_TARIFA_PCT = 35   # % de queda vs média = erro de tarifa
 BA_ALERTA     = 500    # R$/pessoa roundtrip — alerta imediato
 BA_BOM        = 900    # R$/pessoa — bom preço
 BA_ERRO_TARIFA= 280    # R$/pessoa — provável erro de tarifa
+BA_CIAS_OK    = ["latam", "aerolineas", "aerolíneas", "ar"]  # só essas cias
 CIA_EXCLUIR   = []
 
 # Feriados prolongados do Brasil 2026-2027 (início, fim, nome, dias)
@@ -80,7 +81,7 @@ def buscar_voo(origem, destino, data_ida, data_volta, adultos, criancas=0):
         print(f"  Erro SerpAPI {origem}→{destino}: {e}")
         return {}
 
-def melhor_preco(data, tipo="econ"):
+def melhor_preco(data, tipo="econ", apenas_cias=None, exigir_bagagem=False):
     todos = data.get("best_flights", []) + data.get("other_flights", [])
     melhor = None
     cia_melhor = "—"
@@ -88,16 +89,46 @@ def melhor_preco(data, tipo="econ"):
         preco = voo.get("price")
         if not preco:
             continue
+
         flights = voo.get("flights", [])
         cia = flights[0].get("airline", "—") if flights else "—"
+
+        # Filtro de cias permitidas
+        if apenas_cias:
+            cia_ok = any(c.lower() in cia.lower() for c in apenas_cias)
+            if not cia_ok:
+                continue
+
+        # Filtro de cias excluídas
         if any(exc.lower() in cia.lower() for exc in CIA_EXCLUIR):
             continue
+
+        # Filtro de bagagem despachada
+        if exigir_bagagem:
+            tem_bagagem = False
+            for traveler in voo.get("traveler_pricings", voo.get("extensions", [])):
+                if isinstance(traveler, dict):
+                    bags = traveler.get("checked_bags", traveler.get("baggage_prices", []))
+                    if bags is not None and bags != [] and bags != {}:
+                        tem_bagagem = True
+            # fallback: se não tem info de bagagem, confia na tarifa (SerpAPI nem sempre retorna)
+            # filtra só quando tem certeza que NÃO inclui
+            carryon = voo.get("extensions", [])
+            if isinstance(carryon, list):
+                for ext in carryon:
+                    if "bagagem" in str(ext).lower() and "não" in str(ext).lower():
+                        tem_bagagem = False
+                        break
+                    if "checked bag" in str(ext).lower() or "mala" in str(ext).lower():
+                        tem_bagagem = True
+
         travel_class = flights[0].get("travel_class", "Economy") if flights else "Economy"
         eh_exec = "business" in travel_class.lower() or "first" in travel_class.lower()
         if tipo == "exec" and not eh_exec:
             continue
         if tipo == "econ" and eh_exec:
             continue
+
         if melhor is None or preco < melhor:
             melhor = preco
             cia_melhor = cia
@@ -210,9 +241,11 @@ def monitor_buenos_aires():
         melhor_aeroporto = "—"
 
         for aeroporto in ["EZE", "AEP"]:
-            print(f"    → GRU → {aeroporto}...")
+            print(f"    → GRU → {aeroporto} (só LATAM/Aerolíneas, com bagagem)...")
             data = buscar_voo("GRU", aeroporto, data_ida, data_volta, 2)
-            preco_t, cia_t = melhor_preco(data, "econ")
+            preco_t, cia_t = melhor_preco(data, "econ",
+                                          apenas_cias=BA_CIAS_OK,
+                                          exigir_bagagem=True)
             if preco_t:
                 print(f"       {aeroporto}: R$ {round(preco_t/2):,}/pessoa ({cia_t})")
                 if melhor_preco_total is None or preco_t < melhor_preco_total:
