@@ -2,85 +2,82 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="Florida 2027"/>
-<title>🌴 Passagens Florida 2027</title>
+<meta name="apple-mobile-web-app-title" content="Passagens"/>
+<title>✈️ Monitor de Passagens</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:#060d1a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;max-width:500px;margin:0 auto}
-button{cursor:pointer;font-family:inherit}
+button{cursor:pointer;font-family:inherit;transition:all .15s}
 
-/* Header */
-#header{background:#060d1a;border-bottom:1px solid #0f1f38;position:sticky;top:0;z-index:99;padding:14px 16px 0}
-.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.brand-eyebrow{font-size:10px;color:#38bdf8;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
-.brand-title{font-size:20px;font-weight:900;color:#f0f9ff;margin-top:2px}
-.brand-sub{font-size:10px;color:#334155;margin-top:1px}
+/* HEADER */
+#header{background:#060d1a;border-bottom:1px solid #0f1f38;position:sticky;top:0;z-index:99;padding:12px 16px 0}
 
-/* Tab bar */
+/* DEST SELECTOR */
+.dest-bar{display:flex;gap:8px;margin-bottom:12px}
+.dest-btn{flex:1;padding:8px 12px;border-radius:12px;border:1px solid #1e293b;background:#0a1628;color:#64748b;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.dest-btn.active{border-color:#38bdf8;background:#1e3a5f;color:#e2e8f0}
+
+/* TAB BAR */
 #tabbar{display:flex;border-top:1px solid #0f1f38}
-.tab{flex:1;padding:10px 0 8px;background:none;border:none;border-bottom:2px solid transparent;transition:all .15s;color:#475569}
+.tab{flex:1;padding:10px 0 8px;background:none;border:none;border-bottom:2px solid transparent;color:#475569}
 .tab.active{border-bottom-color:#38bdf8;color:#38bdf8}
-.tab-icon{font-size:17px;display:block;margin-bottom:2px}
+.tab-icon{font-size:16px;display:block;margin-bottom:2px}
 .tab-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 
-/* Content */
+/* CONTENT */
 #content{padding:16px 14px 40px}
 .page{display:none}.page.active{display:block}
 
-/* Cards */
+/* CARDS */
 .card{background:linear-gradient(135deg,#0f1f38,#0a1628);border:1px solid #1e3a5f;border-radius:18px;padding:16px;margin-bottom:12px}
 .card-sm{background:#0a1628;border:1px solid #1e293b;border-radius:14px;padding:12px}
+.section-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:4px}
 
-/* Status bar */
-.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#0a1628;border:1px solid #1e293b;border-radius:14px;margin-bottom:14px}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
-.dot-green{background:#22c55e;box-shadow:0 0 8px #22c55e}
-.dot-yellow{background:#f59e0b;box-shadow:0 0 8px #f59e0b}
-.btn-refresh{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:7px 12px;color:#94a3b8;font-size:14px}
-
-/* Price display */
-.price-big{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1}
-.price-sub{font-size:11px;color:#64748b;margin-top:4px}
-
-/* Gauge */
-.gauge-wrap{margin-top:10px}
-.gauge-track{position:relative;height:6px;background:#1e293b;border-radius:4px;overflow:visible;margin-bottom:4px}
-.gauge-zone-fire{position:absolute;left:0;top:0;height:100%;background:#22c55e22;border-right:1px solid #22c55e44}
-.gauge-zone-good{position:absolute;top:0;height:100%;background:#f59e0b22;border-right:1px solid #f59e0b44}
-.gauge-dot{position:absolute;top:-3px;width:12px;height:12px;border-radius:50%;border:2px solid #060d1a;transform:translateX(-50%)}
-.gauge-labels{display:flex;justify-content:space-between;font-size:9px;color:#475569}
-
-/* Tag */
+/* TAGS / PILLS */
 .tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.pill-green{background:#22c55e22;color:#22c55e}
+.pill-yellow{background:#f59e0b22;color:#f59e0b}
+.pill-red{background:#ef4444;color:#fff}
+.pill-blue{background:#38bdf822;color:#38bdf8}
+.pill-purple{background:#a78bfa22;color:#a78bfa}
 
-/* Grid */
+/* GRIDS */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
 
-/* Table */
-.tbl-head{padding:11px 14px;background:#060d1a;border-bottom:1px solid #1e293b;font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;display:grid;gap:6px}
+/* TABLE */
+.tbl-head{padding:10px 14px;background:#060d1a;border-bottom:1px solid #1e293b;display:grid;gap:6px;font-size:9px;color:#475569;font-weight:700;text-transform:uppercase}
 .tbl-row{padding:10px 14px;border-bottom:1px solid #0a1628;display:grid;gap:6px;align-items:center}
 
-/* Alert banner */
+/* GAUGE */
+.gauge-track{position:relative;height:6px;background:#1e293b;border-radius:4px;margin:10px 0 4px}
+.gauge-dot{position:absolute;top:-3px;width:12px;height:12px;border-radius:50%;border:2px solid #060d1a;transform:translateX(-50%);display:none}
+.gauge-labels{display:flex;justify-content:space-between;font-size:9px;color:#475569;margin-top:2px}
+
+/* STATUS */
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#0a1628;border:1px solid #1e293b;border-radius:14px;margin-bottom:14px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+
+/* ALERT BANNER */
 .alert-banner{background:linear-gradient(135deg,#14532d,#166534);border:1px solid #22c55e44;border-radius:16px;padding:14px 16px;margin-bottom:14px}
 
-/* Toggle */
+/* TOGGLE */
 .toggle{display:flex;background:#0a1628;border:1px solid #1e293b;border-radius:14px;padding:4px;margin-bottom:14px;gap:4px}
-.toggle-btn{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:#64748b;font-weight:700;font-size:13px;transition:all .2s}
-.toggle-btn.active{background:#1e3a5f;color:#38bdf8}
+.tog-btn{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:#64748b;font-weight:700;font-size:13px}
+.tog-btn.active{background:#1e3a5f;color:#38bdf8}
 
-/* Accordion */
-.acc-item{background:#0a1628;border:1px solid #1e293b;border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:background .2s}
+/* ACCORDION */
+.acc-item{background:#0a1628;border:1px solid #1e293b;border-radius:14px;padding:14px 16px;margin-bottom:8px}
 .acc-item.open{background:linear-gradient(135deg,#0f1f38,#0a1628);border-color:#1e3a5f}
 .acc-head{display:flex;justify-content:space-between;align-items:center}
 .acc-arrow{font-size:16px;color:#475569;transition:transform .2s}
 .acc-item.open .acc-arrow{transform:rotate(180deg)}
-.acc-body{margin-top:12px;font-size:13px;color:#94a3b8;line-height:1.7;border-top:1px solid #1e293b;padding-top:12px;display:none}
+.acc-body{display:none;margin-top:12px;font-size:13px;color:#94a3b8;line-height:1.7;border-top:1px solid #1e293b;padding-top:12px}
 .acc-item.open .acc-body{display:block}
 
-/* Timeline */
+/* TIMELINE */
 .timeline{position:relative;padding-left:20px}
 .timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:linear-gradient(#38bdf8,#ef4444)}
 .tl-item{position:relative;margin-bottom:16px}
@@ -88,12 +85,16 @@ button{cursor:pointer;font-family:inherit}
 .tl-date{font-size:11px;font-weight:700;margin-bottom:2px}
 .tl-text{font-size:12px;color:#94a3b8;line-height:1.4}
 
-/* Open jaw route */
+/* ROUTE STEPS */
 .route-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
 .route-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
 
-/* Misc */
-.section-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+/* FERIADO CARD */
+.feriado-card{border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid #1e293b;background:#0a1628}
+.feriado-card.oferta{background:linear-gradient(135deg,#14532d18,#0a1628);border-color:#22c55e55}
+.feriado-card.erro{background:linear-gradient(135deg,#7f1d1d22,#0a1628);border-color:#ef444455}
+.feriado-card.bom{background:linear-gradient(135deg,#1e3a5f22,#0a1628);border-color:#38bdf855}
+
 .empty{text-align:center;padding:50px 20px;color:#475569;font-size:14px;line-height:1.6}
 .empty-icon{font-size:40px;margin-bottom:12px}
 </style>
@@ -101,529 +102,443 @@ button{cursor:pointer;font-family:inherit}
 <body>
 
 <div id="header">
-  <div class="header-top">
-    <div>
-      <div class="brand-eyebrow">Monitor Automático</div>
-      <div class="brand-title">🌴 Flórida 2027</div>
-      <div class="brand-sub">GRU→MCO | MIA→GRU | Matheus, Karine & Luca</div>
-    </div>
-    <div style="text-align:right;font-size:10px;color:#334155">
-      <div id="status-dot" style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:4px">
-        <span class="dot dot-yellow"></span>
-        <span id="status-text" style="font-size:11px;color:#f59e0b;font-weight:700">Carregando</span>
-      </div>
-      <div id="last-update" style="color:#475569">—</div>
-    </div>
+  <!-- DESTINATION SELECTOR -->
+  <div class="dest-bar">
+    <button class="dest-btn active" id="dest-fl" onclick="setDest('florida')">
+      🌴 <span>Flórida 2027</span>
+    </button>
+    <button class="dest-btn" id="dest-ba" onclick="setDest('buenos_aires')">
+      🇦🇷 <span>Buenos Aires</span>
+    </button>
   </div>
+
+  <!-- TABS - mudam por destino -->
   <div id="tabbar">
-    <button class="tab active" onclick="goTab('home')"><span class="tab-icon">🏠</span><span class="tab-label">Início</span></button>
-    <button class="tab" onclick="goTab('hist')"><span class="tab-icon">📈</span><span class="tab-label">Histórico</span></button>
-    <button class="tab" onclick="goTab('cias')"><span class="tab-icon">✈️</span><span class="tab-label">Cias</span></button>
-    <button class="tab" onclick="goTab('rotas')"><span class="tab-icon">🗺️</span><span class="tab-label">Rotas</span></button>
-    <button class="tab" onclick="goTab('dicas')"><span class="tab-icon">💡</span><span class="tab-label">Dicas</span></button>
+    <button class="tab active" id="tab0" onclick="goTab(0)"><span class="tab-icon">🏠</span><span class="tab-label">Início</span></button>
+    <button class="tab" id="tab1" onclick="goTab(1)"><span class="tab-icon">📈</span><span class="tab-label">Histórico</span></button>
+    <button class="tab" id="tab2" onclick="goTab(2)"><span class="tab-icon">✈️</span><span class="tab-label">Cias</span></button>
+    <button class="tab" id="tab3" onclick="goTab(3)"><span class="tab-icon">🗺️</span><span class="tab-label">Rotas</span></button>
+    <button class="tab" id="tab4" onclick="goTab(4)"><span class="tab-icon">💡</span><span class="tab-label">Dicas</span></button>
   </div>
 </div>
 
 <div id="content">
-
-  <!-- HOME -->
-  <div id="page-home" class="page active">
-    <div class="status-bar">
-      <div style="font-size:12px;color:#64748b">Última atualização automática</div>
-      <div id="home-lastupdate" style="font-size:11px;color:#475569">—</div>
-      <button class="btn-refresh" onclick="loadData()">🔄</button>
-    </div>
-    <div id="home-alert" style="display:none" class="alert-banner">
-      <div style="font-size:14px;color:#86efac;font-weight:800">🔥 Oferta detectada!</div>
-      <div style="font-size:12px;color:#4ade80;margin-top:4px" id="home-alert-text"></div>
-    </div>
-    <div id="home-empty" class="card" style="text-align:center;padding:40px">
-      <div style="font-size:40px;margin-bottom:14px">⏳</div>
-      <div style="font-size:14px;color:#64748b;line-height:1.7">Passagens para Maio 2027 ainda não abertas para venda.<br>O sistema monitora todo dia às 8h e te avisa quando abrirem!</div>
-    </div>
-    <div id="home-prices" style="display:none">
-      <div class="card">
-        <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">✈️ Econômica — Melhor preço hoje</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end">
-          <div><div id="econ-price" class="price-big">—</div><div id="econ-cia" class="price-sub">—</div></div>
-          <div style="text-align:right"><span id="econ-tag" class="tag"></span><div id="econ-delta" style="font-size:11px;margin-top:6px"></div></div>
-        </div>
-        <div class="gauge-wrap">
-          <div class="gauge-track">
-            <div class="gauge-zone-fire" style="width:30%"></div>
-            <div class="gauge-zone-good" style="left:30%;width:20%"></div>
-            <div id="econ-dot" class="gauge-dot" style="display:none"></div>
-          </div>
-          <div class="gauge-labels"><span>R$2k</span><span style="color:#22c55e">🔥R$3,5k</span><span style="color:#f59e0b">R$4,5k</span><span>R$7k</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🛋️ Executiva — Melhor preço hoje</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end">
-          <div><div id="exec-price" class="price-big">—</div><div id="exec-cia" class="price-sub">—</div></div>
-          <div><span id="exec-tag" class="tag"></span></div>
-        </div>
-        <div class="gauge-wrap">
-          <div class="gauge-track">
-            <div class="gauge-zone-fire" style="width:24%"></div>
-            <div class="gauge-zone-good" style="left:24%;width:23%"></div>
-            <div id="exec-dot" class="gauge-dot" style="display:none"></div>
-          </div>
-          <div class="gauge-labels"><span>R$5k</span><span style="color:#22c55e">🔥R$9k</span><span style="color:#f59e0b">R$13k</span><span>R$22k</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="grid2" id="home-kpis"></div>
-    <div class="card" id="home-minichart-wrap" style="display:none">
-      <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Econômica — últimos dias</div>
-      <canvas id="mini-chart" height="100" style="width:100%"></canvas>
-      <div style="font-size:10px;color:#475569;margin-top:6px">linha verde = gatilho de alerta WhatsApp</div>
-    </div>
-  </div>
-
-  <!-- HISTÓRICO -->
-  <div id="page-hist" class="page">
-    <div class="toggle">
-      <button class="toggle-btn active" id="tog-econ" onclick="setHistMode('econ')">✈️ Econômica</button>
-      <button class="toggle-btn" id="tog-exec" onclick="setHistMode('exec')">🛋️ Executiva</button>
-    </div>
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Evolução de preços</div>
-      <canvas id="hist-chart" height="140" style="width:100%"></canvas>
-    </div>
-    <div class="grid3" id="hist-stats"></div>
-    <div class="card" style="padding:0;overflow:hidden">
-      <div class="tbl-head" style="grid-template-columns:72px 1fr 80px 36px"><span>Data</span><span>Preço/pessoa</span><span>Cia</span><span>🔥</span></div>
-      <div id="hist-rows"></div>
-    </div>
-  </div>
-
-  <!-- CIAS -->
-  <div id="page-cias" class="page">
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Menor preço econômica por companhia</div>
-      <canvas id="cias-chart" height="160" style="width:100%"></canvas>
-    </div>
-    <div id="cias-cards"></div>
-  </div>
-
-  <!-- ROTAS -->
-  <div id="page-rotas" class="page">
-    <div style="background:linear-gradient(135deg,#1e3a5f,#0a2540);border:1px solid #38bdf844;border-radius:18px;padding:20px;margin-bottom:14px">
-      <div style="font-size:10px;color:#38bdf8;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Estratégia recomendada</div>
-      <div style="font-size:24px;font-weight:900;color:#f0f9ff;margin-bottom:14px">Open Jaw ✈️</div>
-      <div class="route-step"><div class="route-icon">✈️</div><div><div style="font-size:13px;font-weight:700;color:#e2e8f0">GRU → MCO</div><div style="font-size:11px;color:#64748b">Voo de ida para Orlando</div></div></div>
-      <div class="route-step"><div class="route-icon">🎢</div><div><div style="font-size:13px;font-weight:700;color:#e2e8f0">Orlando (7–10 dias)</div><div style="font-size:11px;color:#64748b">Disney, Universal, Kennedy Space Center</div></div></div>
-      <div class="route-step"><div class="route-icon">🚗</div><div><div style="font-size:13px;font-weight:700;color:#e2e8f0">Drive MCO → MIA (~4h)</div><div style="font-size:11px;color:#64748b">Pela US-1 ou Florida Turnpike</div></div></div>
-      <div class="route-step"><div class="route-icon">🏖️</div><div><div style="font-size:13px;font-weight:700;color:#e2e8f0">Miami + Florida Keys (5–7 dias)</div><div style="font-size:11px;color:#64748b">South Beach, Wynwood, Key West</div></div></div>
-      <div class="route-step"><div class="route-icon">✈️</div><div><div style="font-size:13px;font-weight:700;color:#e2e8f0">MIA → GRU</div><div style="font-size:11px;color:#64748b">Voo de volta de Miami</div></div></div>
-      <div style="background:#0a1628;border-radius:12px;padding:12px 14px;margin-top:6px">
-        <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px">💡 Por que Open Jaw economiza?</div>
-        <div style="font-size:12px;color:#94a3b8;line-height:1.6">Você paga a mesma tarifa de um roundtrip normal mas elimina o custo de voltar de Miami para Orlando (carro ~$80 ou voo ~R$400). Com a família, isso pode representar <strong style="color:#e2e8f0">R$800–1.200 de economia</strong>.</div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px">MCO vs MIA — qual escolher?</div>
-      <div class="grid2" style="margin-bottom:14px">
-        <div class="card-sm">
-          <div style="font-size:24px;margin-bottom:6px">🎢</div>
-          <div style="font-size:14px;font-weight:800;color:#e2e8f0">Orlando</div>
-          <div style="font-size:10px;color:#64748b;margin-bottom:8px">MCO</div>
-          <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px">R$ 4.200–5.800</div>
-          <div style="font-size:10px;color:#86efac;margin-bottom:2px">✓ Entrada direto nos parques</div>
-          <div style="font-size:10px;color:#86efac">✓ Sem deslocamento inicial</div>
-          <div style="font-size:10px;color:#f87171;margin-top:4px">✗ Às vezes 10% mais caro</div>
-        </div>
-        <div class="card-sm">
-          <div style="font-size:24px;margin-bottom:6px">🌴</div>
-          <div style="font-size:14px;font-weight:800;color:#e2e8f0">Miami</div>
-          <div style="font-size:10px;color:#64748b;margin-bottom:8px">MIA</div>
-          <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px">R$ 3.900–5.400</div>
-          <div style="font-size:10px;color:#86efac;margin-bottom:2px">✓ Pode ser 10–15% mais barato</div>
-          <div style="font-size:10px;color:#86efac">✓ Ótimo para começar por Miami</div>
-          <div style="font-size:10px;color:#f87171;margin-top:4px">✗ Carro obrigatório até Orlando</div>
-        </div>
-      </div>
-      <div style="background:#0a1628;border-radius:12px;padding:12px 14px;border:1px solid #f59e0b44">
-        <div style="font-size:11px;color:#f59e0b;font-weight:700;margin-bottom:4px">⚠️ Dica importante</div>
-        <div style="font-size:12px;color:#94a3b8;line-height:1.6">Sempre pesquise os dois aeroportos. A diferença pode chegar a <strong style="color:#e2e8f0">R$800–1.200 por pessoa</strong>. Com 2 adultos, são até R$2.400 de economia.</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:12px">💰 Tabela de referência de preços</div>
-      <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:8px">Classe Econômica — por pessoa</div>
-      <div id="ref-econ"></div>
-      <div style="font-size:11px;color:#a78bfa;font-weight:700;margin:14px 0 8px">Classe Executiva — por pessoa</div>
-      <div id="ref-exec"></div>
-    </div>
-  </div>
-
-  <!-- DICAS -->
-  <div id="page-dicas" class="page">
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px">📅 Cronograma de compra</div>
-      <div class="timeline" id="cronograma"></div>
-    </div>
-    <div class="section-label">Estratégias de compra</div>
-    <div id="dicas-list"></div>
-  </div>
-
-</div><!-- end content -->
+  <!-- FLORIDA PAGES -->
+  <div id="fl-0" class="page active" data-dest="florida" data-idx="0"></div>
+  <div id="fl-1" class="page" data-dest="florida" data-idx="1"></div>
+  <div id="fl-2" class="page" data-dest="florida" data-idx="2"></div>
+  <div id="fl-3" class="page" data-dest="florida" data-idx="3"></div>
+  <div id="fl-4" class="page" data-dest="florida" data-idx="4"></div>
+  <!-- BA PAGES -->
+  <div id="ba-0" class="page" data-dest="buenos_aires" data-idx="0"></div>
+  <div id="ba-1" class="page" data-dest="buenos_aires" data-idx="1"></div>
+  <div id="ba-2" class="page" data-dest="buenos_aires" data-idx="2"></div>
+</div>
 
 <script>
-const SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIBq1y2H4_Q1qCEG9kXdTEmQAtiNrS6kzb9n8sDdFUbVq-gKL_rYRS-IqOHyq6iwPvSNTn_wPnocRh/pub?gid=1427060977&single=true&output=csv";
-const ECON_FIRE=3500,ECON_GOOD=4500,EXEC_FIRE=9000,EXEC_GOOD=13000;
-let DATA=[], HIST_MODE="econ";
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const FL_SHEETS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIBq1y2H4_Q1qCEG9kXdTEmQAtiNrS6kzb9n8sDdFUbVq-gKL_rYRS-IqOHyq6iwPvSNTn_wPnocRh/pub?gid=1427060977&single=true&output=csv";
+// Quando criar a aba Buenos Aires, publique e cole a URL aqui:
+const BA_SHEETS = "";
 
-function fmt(v){return v?"R$ "+Number(v).toLocaleString("pt-BR"):"—"}
+const FL_ECON_FIRE=3500,FL_ECON_GOOD=4500,FL_EXEC_FIRE=9000,FL_EXEC_GOOD=13000;
+const BA_FIRE=500,BA_GOOD=900,BA_ERRO=280;
+
+let DEST = "florida";
+let CUR_TAB = 0;
+let FL_DATA = [], BA_DATA = [];
+
+// Feriados para mostrar no portal
+const FERIADOS = [
+  {nome:"Tiradentes + Páscoa",ida:"2026-04-18",volta:"2026-04-21",dias:4},
+  {nome:"Dia do Trabalho",    ida:"2026-05-01",volta:"2026-05-03",dias:3},
+  {nome:"Corpus Christi",     ida:"2026-06-11",volta:"2026-06-13",dias:3},
+  {nome:"Independência",      ida:"2026-09-05",volta:"2026-09-07",dias:3},
+  {nome:"Nossa Senhora",      ida:"2026-10-10",volta:"2026-10-12",dias:3},
+  {nome:"Finados",            ida:"2026-10-31",volta:"2026-11-02",dias:3},
+  {nome:"Natal",              ida:"2026-12-25",volta:"2026-12-27",dias:3},
+  {nome:"Réveillon",          ida:"2026-12-31",volta:"2027-01-02",dias:3},
+  {nome:"Carnaval",           ida:"2027-02-13",volta:"2027-02-16",dias:4},
+  {nome:"Semana Santa",       ida:"2027-04-01",volta:"2027-04-04",dias:4},
+  {nome:"Independência",      ida:"2027-09-04",volta:"2027-09-07",dias:4},
+  {nome:"Nossa Senhora",      ida:"2027-10-09",volta:"2027-10-12",dias:4},
+  {nome:"Finados",            ida:"2027-10-30",volta:"2027-11-02",dias:4},
+  {nome:"Proclamação",        ida:"2027-11-13",volta:"2027-11-15",dias:3},
+];
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
 function pp(s){return parseInt(String(s||"").replace(/[R$\s]/g,"").replace(/\./g,"").replace(",","."))||0}
-function pColor(v,type){const f=type==="econ"?ECON_FIRE:EXEC_FIRE,g=type==="econ"?ECON_GOOD:EXEC_GOOD;if(!v)return"#334155";if(v<=f)return"#22c55e";if(v<=g)return"#f59e0b";return"#ef4444"}
-function pTag(v,type){const c=pColor(v,type);const f=type==="econ"?ECON_FIRE:EXEC_FIRE,g=type==="econ"?ECON_GOOD:EXEC_GOOD;if(!v)return{c:"#334155",l:"Sem dados"};if(v<=f)return{c:"#22c55e",l:"🔥 Promoção!"};if(v<=g)return{c:"#86efac",l:"✅ Boa oferta"};if(v<=5500&&type==="econ")return{c:"#f59e0b",l:"😐 Normal"};if(v<=16000&&type==="exec")return{c:"#f59e0b",l:"😐 Normal"};return{c:"#ef4444",l:"😬 Caro"}}
-function ciaColor(n){const k=(n||"").toLowerCase();if(k.includes("latam"))return"#e31837";if(k.includes("american"))return"#0078d2";if(k.includes("copa"))return"#004b87";if(k.includes("tap"))return"#006b3f";if(k.includes("united"))return"#003087";if(k.includes("delta"))return"#c41230";return"#7c3aed"}
+function fmt(v){return v?"R$ "+Number(v).toLocaleString("pt-BR"):"—"}
+function fmtK(v){return v?"R$"+(v/1000).toFixed(0)+"k":"—"}
+function pColor(v,fire,good){if(!v)return"#334155";if(v<=fire)return"#22c55e";if(v<=good)return"#f59e0b";return"#ef4444"}
+function pTag(v,fire,good){if(!v)return{c:"#334155",l:"Sem dados"};if(v<=fire)return{c:"#22c55e",l:"🔥 Promoção!"};if(v<=good)return{c:"#86efac",l:"✅ Boa oferta"};return{c:"#ef4444",l:"😬 Caro"}}
+function ciaColor(n){const k=(n||"").toLowerCase();if(k.includes("latam"))return"#e31837";if(k.includes("american"))return"#0078d2";if(k.includes("copa"))return"#004b87";if(k.includes("tap"))return"#006b3f";return"#7c3aed"}
+function isFuture(d){return new Date(d)>new Date()}
+function fmtDate(d){if(!d)return"—";const p=d.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
 
-// ── TAB NAV ──────────────────────────────────────────────────────────────────
-function goTab(id){
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────────
+const FL_TABS=[{icon:"🏠",label:"Início"},{icon:"📈",label:"Histórico"},{icon:"✈️",label:"Cias"},{icon:"🗺️",label:"Rotas"},{icon:"💡",label:"Dicas"}];
+const BA_TABS=[{icon:"🇦🇷",label:"Oport."},{icon:"📊",label:"Histórico"},{icon:"💡",label:"Dicas"}];
+
+function updateTabBar(){
+  const tabs=DEST==="florida"?FL_TABS:BA_TABS;
+  const bar=document.getElementById("tabbar");
+  bar.innerHTML=tabs.map((t,i)=>`<button class="tab${i===CUR_TAB?" active":""}" id="tab${i}" onclick="goTab(${i})"><span class="tab-icon">${t.icon}</span><span class="tab-label">${t.label}</span></button>`).join("");
+}
+
+function setDest(d){
+  DEST=d; CUR_TAB=0;
+  document.getElementById("dest-fl").classList.toggle("active",d==="florida");
+  document.getElementById("dest-ba").classList.toggle("active",d==="buenos_aires");
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById("page-"+id).classList.add("active");
-  event.currentTarget.classList.add("active");
-  if(id==="cias")renderCias();
-  if(id==="hist")renderHist();
+  document.getElementById((d==="florida"?"fl":"ba")+"-0").classList.add("active");
+  updateTabBar();
+  if(d==="florida") renderFlorida();
+  else renderBA();
+}
+
+function goTab(i){
+  CUR_TAB=i;
+  const prefix=DEST==="florida"?"fl":"ba";
+  document.querySelectorAll(".page").forEach(p=>{if(p.id.startsWith(prefix))p.classList.remove("active")});
+  const page=document.getElementById(prefix+"-"+i);
+  if(page)page.classList.add("active");
+  updateTabBar();
+  if(DEST==="florida")renderFlorida();
+  else renderBA();
 }
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
-async function loadData(){
-  setStatus("loading");
+async function loadAll(){
+  // Florida
   try{
-    const r=await fetch(SHEETS_URL+"&t="+Date.now());
+    const r=await fetch(FL_SHEETS+"&t="+Date.now());
     const t=await r.text();
-    const lines=t.trim().split("\n").slice(4).filter(l=>l.trim());
-    DATA=lines.map(l=>{
+    FL_DATA=t.trim().split("\n").slice(4).filter(l=>l.trim()).map(l=>{
       const c=l.split(",");
-      return{date:(c[0]||"").trim(),econ:pp(c[1]),exec:pp(c[2]),cia:(c[3]||"").trim()||"—",best:pp(c[4]),queda:(c[5]||"").trim(),oferta:(c[6]||"").trim(),alerta:(c[7]||"").trim(),obs:(c[8]||"").trim()};
+      return{date:c[0]?.trim(),econ:pp(c[1]),exec:pp(c[2]),cia:c[3]?.trim()||"—",best:pp(c[4]),queda:c[5]?.trim(),oferta:c[6]?.trim(),alerta:c[7]?.trim(),obs:c[8]?.trim()};
     }).filter(r=>r.date&&r.econ>0);
-    document.getElementById("last-update").textContent=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-    document.getElementById("home-lastupdate").textContent=new Date().toLocaleString("pt-BR");
-    setStatus(DATA.length?"ok":"empty");
-    renderHome();
-    renderHist();
-    renderRefTable();
-    renderCronograma();
-    renderDicas();
-  }catch(e){
-    console.error(e);
-    setStatus("error");
-  }
-}
+  }catch(e){console.error("FL load:",e)}
 
-function setStatus(s){
-  const dot=document.getElementById("status-dot");
-  const txt=document.getElementById("status-text");
-  if(s==="ok"){dot.innerHTML='<span class="dot dot-green"></span>';txt.style.color="#86efac";txt.textContent="Ao vivo";}
-  else if(s==="loading"){dot.innerHTML='<span class="dot dot-yellow"></span>';txt.style.color="#f59e0b";txt.textContent="Buscando...";}
-  else if(s==="empty"){dot.innerHTML='<span class="dot dot-yellow"></span>';txt.style.color="#f59e0b";txt.textContent="Aguardando";}
-  else{dot.innerHTML='<span class="dot" style="background:#ef4444"></span>';txt.style.color="#ef4444";txt.textContent="Erro";}
-}
-
-// ── HOME ──────────────────────────────────────────────────────────────────────
-function renderHome(){
-  const latest=DATA[DATA.length-1];
-  const prev=DATA[DATA.length-2];
-  const alerts=DATA.filter(r=>r.alerta.toUpperCase()==="SIM");
-  const bestEcon=DATA.length?Math.min(...DATA.map(r=>r.econ).filter(Boolean)):0;
-
-  // alert banner
-  if(alerts.length){
-    document.getElementById("home-alert").style.display="block";
-    document.getElementById("home-alert-text").textContent="WhatsApp enviado em "+alerts[alerts.length-1].date;
+  // Buenos Aires
+  if(BA_SHEETS){
+    try{
+      const r=await fetch(BA_SHEETS+"&t="+Date.now());
+      const t=await r.text();
+      BA_DATA=t.trim().split("\n").slice(1).filter(l=>l.trim()).map(l=>{
+        const c=l.split(",");
+        return{date:c[0]?.trim(),hora:c[1]?.trim(),feriado:c[2]?.trim(),data_ida:c[3]?.trim(),data_volta:c[4]?.trim(),dias:c[5]?.trim(),preco_pp:pp(c[6]),cia:c[7]?.trim()||"—",oferta:c[8]?.trim(),alerta:c[9]?.trim(),obs:c[10]?.trim()};
+      }).filter(r=>r.feriado);
+    }catch(e){console.error("BA load:",e)}
   }
 
-  if(!latest||!latest.econ){
-    document.getElementById("home-empty").style.display="block";
-    document.getElementById("home-prices").style.display="none";
-  } else {
-    document.getElementById("home-empty").style.display="none";
-    document.getElementById("home-prices").style.display="block";
-    // econ
-    const et=pTag(latest.econ,"econ");
-    document.getElementById("econ-price").textContent=fmt(latest.econ);
-    document.getElementById("econ-price").style.color=et.c;
-    document.getElementById("econ-cia").textContent="por pessoa • "+latest.cia;
-    const etag=document.getElementById("econ-tag");
-    etag.textContent=et.l; etag.style.background=et.c+"22"; etag.style.color=et.c;
-    if(prev&&prev.econ){const d=latest.econ-prev.econ;document.getElementById("econ-delta").innerHTML='<span style="color:'+(d<0?"#22c55e":"#ef4444")+'">'+(d<0?"▼":"▲")+" "+fmt(Math.abs(d))+" vs ontem</span>";}
-    const eDot=document.getElementById("econ-dot");
-    const ePct=Math.min(98,Math.max(2,((latest.econ-2000)/(7000-2000))*100));
-    eDot.style.left=ePct+"%"; eDot.style.background=et.c; eDot.style.display="block";
-    // exec
-    const xt=pTag(latest.exec,"exec");
-    document.getElementById("exec-price").textContent=fmt(latest.exec);
-    document.getElementById("exec-price").style.color=xt.c;
-    document.getElementById("exec-cia").textContent="por pessoa • "+latest.cia;
-    const xtag=document.getElementById("exec-tag");
-    xtag.textContent=xt.l; xtag.style.background=xt.c+"22"; xtag.style.color=xt.c;
-    if(latest.exec>0){const xDot=document.getElementById("exec-dot");const xPct=Math.min(98,Math.max(2,((latest.exec-5000)/(22000-5000))*100));xDot.style.left=xPct+"%";xDot.style.background=xt.c;xDot.style.display="block";}
-  }
-
-  // KPIs
-  const kpis=[
-    {e:"🏆",l:"Recorde histórico",v:fmt(bestEcon),s:"menor econômica já vista"},
-    {e:"🔔",l:"Alertas enviados",v:alerts.length,s:"WhatsApps disparados"},
-    {e:"📊",l:"Dias monitorados",v:DATA.length,s:"registros no histórico"},
-    {e:"🎯",l:"Janela ideal",v:"Ago–Set/26",s:"melhor momento para comprar"},
-  ];
-  document.getElementById("home-kpis").innerHTML=kpis.map(k=>`
-    <div class="card-sm">
-      <div style="font-size:22px;margin-bottom:6px">${k.e}</div>
-      <div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${k.l}</div>
-      <div style="font-size:18px;font-weight:800;color:#e2e8f0">${k.v}</div>
-      <div style="font-size:10px;color:#64748b;margin-top:2px">${k.s}</div>
-    </div>`).join("");
-
-  // Mini chart
-  if(DATA.length>1){
-    document.getElementById("home-minichart-wrap").style.display="block";
-    drawLineChart("mini-chart",DATA.map(r=>r.econ),DATA.map(r=>r.date),"#38bdf8",ECON_FIRE,2000,7000,80);
-  }
+  renderFlorida();
+  renderBA();
 }
 
-// ── HISTÓRICO ─────────────────────────────────────────────────────────────────
-function setHistMode(m){
-  HIST_MODE=m;
-  document.getElementById("tog-econ").classList.toggle("active",m==="econ");
-  document.getElementById("tog-exec").classList.toggle("active",m==="exec");
-  renderHist();
+// ── FLORIDA RENDER ────────────────────────────────────────────────────────────
+function renderFlorida(){
+  const i=CUR_TAB;
+  if(DEST!=="florida")return;
+  if(i===0)renderFlHome();
+  else if(i===1)renderFlHist();
+  else if(i===2)renderFlCias();
+  else if(i===3)renderFlRotas();
+  else if(i===4)renderFlDicas();
 }
-function renderHist(){
-  if(!DATA.length){document.getElementById("hist-rows").innerHTML='<div style="padding:30px;text-align:center;color:#475569;font-size:13px">Sem dados ainda</div>';return;}
-  const vals=DATA.map(r=>r[HIST_MODE]).filter(Boolean);
-  const minV=vals.length?Math.min(...vals):0;
-  const maxV=vals.length?Math.max(...vals):0;
-  const avgV=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-  const type=HIST_MODE;
-  const fireL=type==="econ"?ECON_FIRE:EXEC_FIRE;
-  const minData=type==="econ"?2000:5000;
-  const maxData=type==="econ"?7000:22000;
-  const col=type==="econ"?"#38bdf8":"#a78bfa";
 
-  drawLineChart("hist-chart",DATA.map(r=>r[HIST_MODE]),DATA.map(r=>r.date),col,fireL,minData,maxData,140);
+function renderFlHome(){
+  const el=document.getElementById("fl-0");
+  const latest=FL_DATA[FL_DATA.length-1];
+  const prev=FL_DATA[FL_DATA.length-2];
+  const alerts=FL_DATA.filter(r=>r.alerta?.toUpperCase()==="SIM");
+  const bestEcon=FL_DATA.length?Math.min(...FL_DATA.map(r=>r.econ).filter(Boolean)):0;
+  const lastUpd=FL_DATA.length?FL_DATA[FL_DATA.length-1].date:"—";
+  const et=latest?pTag(latest.econ,FL_ECON_FIRE,FL_ECON_GOOD):{c:"#334155",l:"Sem dados"};
+  const xt=latest?pTag(latest.exec,FL_EXEC_FIRE,FL_EXEC_GOOD):{c:"#334155",l:"Sem dados"};
 
-  document.getElementById("hist-stats").innerHTML=[
-    {l:"⭐ Menor",v:fmt(minV),c:"#22c55e"},
-    {l:"📊 Média",v:fmt(avgV),c:"#f59e0b"},
-    {l:"📈 Maior",v:fmt(maxV),c:"#ef4444"},
-  ].map(s=>`<div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">${s.l}</div><div style="font-size:12px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join("");
+  let alertBanner="";
+  if(alerts.length) alertBanner=`<div class="alert-banner"><div style="font-size:14px;color:#86efac;font-weight:800">🔥 ${alerts.length} oferta detectada!</div><div style="font-size:12px;color:#4ade80;margin-top:4px">WhatsApp enviado</div></div>`;
 
-  const rev=[...DATA].reverse();
-  document.getElementById("hist-rows").innerHTML=rev.map((r,i)=>{
-    const p=r[HIST_MODE]||0;
-    const deal=r.oferta.toUpperCase()==="SIM";
-    const best=p===minV&&p>0;
-    const bg=deal?"#14532d18":best?"#1e3a5f18":i%2===0?"transparent":"#060d1a";
-    return`<div class="tbl-row" style="grid-template-columns:72px 1fr 80px 36px;background:${bg}">
-      <span style="font-size:10px;color:#64748b">${r.date}</span>
-      <span style="font-size:13px;font-weight:800;color:${p?pColor(p,HIST_MODE):"#334155"}">${fmt(p)||"—"}</span>
-      <span style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.cia}</span>
-      <span style="font-size:13px;text-align:center">${deal?"🔥":best?"⭐":"—"}</span>
+  let pricesHtml="";
+  if(latest&&latest.econ){
+    const ePct=Math.min(96,Math.max(4,((latest.econ-2000)/(7000-2000)*100)));
+    const xPct=latest.exec?Math.min(96,Math.max(4,((latest.exec-5000)/(22000-5000)*100))):0;
+    const eDelta=prev&&prev.econ?(latest.econ-prev.econ):null;
+    pricesHtml=`
+    <div class="card">
+      <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">✈️ Econômica — Hoje</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div><div style="font-size:30px;font-weight:900;color:${et.c};letter-spacing:-1px">${fmt(latest.econ)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">por pessoa • ${latest.cia}</div></div>
+        <div style="text-align:right"><span class="tag" style="background:${et.c}22;color:${et.c}">${et.l}</span>${eDelta!==null?`<div style="font-size:11px;color:${eDelta<0?"#22c55e":"#ef4444"};margin-top:6px">${eDelta<0?"▼":"▲"} ${fmt(Math.abs(eDelta))} vs ontem</div>`:""}
+        </div>
+      </div>
+      <div class="gauge-track"><div style="position:absolute;left:0;top:0;height:100%;width:30%;background:#22c55e22;border-right:1px solid #22c55e44"></div><div style="position:absolute;left:30%;top:0;height:100%;width:20%;background:#f59e0b22;border-right:1px solid #f59e0b44"></div><div class="gauge-dot" style="left:${ePct}%;background:${et.c};display:block"></div></div>
+      <div class="gauge-labels"><span>R$2k</span><span style="color:#22c55e">🔥3,5k</span><span style="color:#f59e0b">4,5k</span><span>7k</span></div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🛋️ Executiva — Hoje</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div><div style="font-size:30px;font-weight:900;color:${xt.c};letter-spacing:-1px">${fmt(latest.exec)}</div><div style="font-size:11px;color:#64748b;margin-top:4px">por pessoa • ${latest.cia}</div></div>
+        <div><span class="tag" style="background:${xt.c}22;color:${xt.c}">${xt.l}</span></div>
+      </div>
+      <div class="gauge-track"><div style="position:absolute;left:0;top:0;height:100%;width:24%;background:#22c55e22;border-right:1px solid #22c55e44"></div><div style="position:absolute;left:24%;top:0;height:100%;width:23%;background:#f59e0b22;border-right:1px solid #f59e0b44"></div>${xPct?`<div class="gauge-dot" style="left:${xPct}%;background:${xt.c};display:block"></div>`:""}</div>
+      <div class="gauge-labels"><span>R$5k</span><span style="color:#22c55e">🔥9k</span><span style="color:#f59e0b">13k</span><span>22k</span></div>
     </div>`;
-  }).join("");
-}
-
-// ── CIAS ──────────────────────────────────────────────────────────────────────
-function renderCias(){
-  const m={};
-  DATA.forEach(r=>{
-    if(!r.cia||r.cia==="—")return;
-    if(!m[r.cia])m[r.cia]={cia:r.cia,econs:[],execs:[],deals:0};
-    if(r.econ>0)m[r.cia].econs.push(r.econ);
-    if(r.exec>0)m[r.cia].execs.push(r.exec);
-    if(r.oferta.toUpperCase()==="SIM")m[r.cia].deals++;
-  });
-  const cias=Object.values(m).map(c=>({
-    cia:c.cia,
-    minEcon:c.econs.length?Math.min(...c.econs):0,
-    avgEcon:c.econs.length?Math.round(c.econs.reduce((a,b)=>a+b,0)/c.econs.length):0,
-    minExec:c.execs.length?Math.min(...c.execs):0,
-    deals:c.deals,dias:c.econs.length
-  })).filter(c=>c.minEcon>0).sort((a,b)=>a.minEcon-b.minEcon);
-
-  if(!cias.length){
-    document.getElementById("cias-cards").innerHTML='<div class="card"><div class="empty"><div class="empty-icon">✈️</div>Quando as passagens abrirem, aqui vai aparecer o comparativo por companhia aérea.</div></div>';
-    return;
+  } else {
+    pricesHtml=`<div class="card"><div class="empty"><div class="empty-icon">⏳</div>Passagens para Maio 2027 ainda não abertas. O sistema monitora 3x por dia e avisa quando abrirem!</div></div>`;
   }
 
-  // bar chart
-  const labels=cias.map(c=>c.cia.split(" ")[0]);
-  const values=cias.map(c=>c.minEcon);
-  const colors=cias.map(c=>ciaColor(c.cia));
-  drawBarChart("cias-chart",labels,values,colors);
+  el.innerHTML=`
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#0a1628;border:1px solid #1e293b;border-radius:14px;margin-bottom:14px">
+    <div style="font-size:12px;color:#64748b">Última busca: ${lastUpd}</div>
+    <button onclick="loadAll()" style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:7px 12px;color:#94a3b8;font-size:14px">🔄</button>
+  </div>
+  ${alertBanner}${pricesHtml}
+  <div class="grid2">
+    <div class="card-sm"><div style="font-size:22px;margin-bottom:6px">🏆</div><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Recorde histórico</div><div style="font-size:18px;font-weight:800">${fmt(bestEcon)||"—"}</div><div style="font-size:10px;color:#64748b">menor econômica</div></div>
+    <div class="card-sm"><div style="font-size:22px;margin-bottom:6px">🔔</div><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Alertas enviados</div><div style="font-size:18px;font-weight:800">${alerts.length}</div><div style="font-size:10px;color:#64748b">via WhatsApp</div></div>
+    <div class="card-sm"><div style="font-size:22px;margin-bottom:6px">📊</div><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Dias monitorados</div><div style="font-size:18px;font-weight:800">${FL_DATA.length}</div><div style="font-size:10px;color:#64748b">registros</div></div>
+    <div class="card-sm"><div style="font-size:22px;margin-bottom:6px">🎯</div><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Janela ideal</div><div style="font-size:18px;font-weight:800">Ago–Set/26</div><div style="font-size:10px;color:#64748b">melhor momento</div></div>
+  </div>
+  ${FL_DATA.length>1?`<div class="card"><div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Econômica — evolução</div><canvas id="fl-mini" height="90" style="width:100%"></canvas><div style="font-size:10px;color:#475569;margin-top:6px">linha verde = gatilho de alerta R$3.500</div></div>`:""}`;
 
-  document.getElementById("cias-cards").innerHTML=cias.map(c=>`
-    <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:10px;height:10px;border-radius:50%;background:${ciaColor(c.cia)}"></div>
-          <span style="font-size:15px;font-weight:800;color:#e2e8f0">${c.cia}</span>
-        </div>
-        ${c.deals>0?`<span class="tag" style="background:#22c55e22;color:#22c55e">🔥 ${c.deals} oferta${c.deals>1?"s":""}</span>`:""}
-      </div>
-      <div class="grid3" style="margin-bottom:8px">
-        <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Menor Econ.</div><div style="font-size:12px;font-weight:800;color:${pColor(c.minEcon,"econ")}">${fmt(c.minEcon)}</div></div>
-        <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Média Econ.</div><div style="font-size:12px;font-weight:800;color:#94a3b8">${fmt(c.avgEcon)}</div></div>
-        <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Menor Exec.</div><div style="font-size:12px;font-weight:800;color:#a78bfa">${c.minExec?fmt(c.minExec):"—"}</div></div>
-      </div>
-      <div style="font-size:10px;color:#475569">Apareceu como melhor em ${c.dias} dia${c.dias!==1?"s":""}</div>
-    </div>`).join("");
+  if(FL_DATA.length>1){
+    setTimeout(()=>drawLine("fl-mini",FL_DATA.map(r=>r.econ),FL_DATA.map(r=>r.date),"#38bdf8",FL_ECON_FIRE,2000,7000,80),50);
+  }
 }
 
-// ── ROTAS ─────────────────────────────────────────────────────────────────────
-function renderRefTable(){
-  const REFS_ECON=[
-    {l:"🔥 Promoção",r:"R$ 2.200–3.500",c:"#22c55e",t:"Compre imediatamente!"},
-    {l:"✅ Boa oferta",r:"R$ 3.500–4.500",c:"#86efac",t:"Abaixo da média histórica"},
-    {l:"😐 Normal",r:"R$ 4.500–5.500",c:"#f59e0b",t:"Faixa típica de mercado"},
-    {l:"😬 Caro",r:"Acima de R$ 5.500",c:"#ef4444",t:"Espere uma queda"},
-  ];
-  const REFS_EXEC=[
-    {l:"🔥 Promoção",r:"R$ 5.000–9.000",c:"#22c55e",t:"Raridade — compre já!"},
-    {l:"✅ Boa oferta",r:"R$ 9.000–13.000",c:"#86efac",t:"Excelente custo-benefício"},
-    {l:"😐 Normal",r:"R$ 13.000–18.000",c:"#f59e0b",t:"Faixa típica"},
-    {l:"🚫 Caro",r:"Acima de R$ 18.000",c:"#ef4444",t:"Use milhas!"},
-  ];
-  const row=r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0f1f38">
-    <span class="tag" style="background:${r.c}22;color:${r.c}">${r.l}</span>
-    <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:#e2e8f0">${r.r}</div><div style="font-size:10px;color:#64748b">${r.t}</div></div>
+function renderFlHist(){
+  const el=document.getElementById("fl-1");
+  const mode=window._histMode||"econ";
+  const vals=FL_DATA.map(r=>r[mode]).filter(Boolean);
+  const minV=vals.length?Math.min(...vals):0,maxV=vals.length?Math.max(...vals):0,avgV=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+  const fire=mode==="econ"?FL_ECON_FIRE:FL_EXEC_FIRE,good=mode==="econ"?FL_ECON_GOOD:FL_EXEC_GOOD;
+  const col=mode==="econ"?"#38bdf8":"#a78bfa";
+  const minY=mode==="econ"?2000:5000,maxY=mode==="econ"?7000:22000;
+  const rev=[...FL_DATA].reverse();
+
+  el.innerHTML=`
+  <div class="toggle">
+    <button class="tog-btn${mode==="econ"?" active":""}" onclick="window._histMode='econ';renderFlHist()">✈️ Econômica</button>
+    <button class="tog-btn${mode==="exec"?" active":""}" onclick="window._histMode='exec';renderFlHist()">🛋️ Executiva</button>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Evolução de preços</div>
+    <canvas id="fl-hist-chart" height="150" style="width:100%"></canvas>
+  </div>
+  <div class="grid3">
+    <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">⭐ Menor</div><div style="font-size:12px;font-weight:800;color:#22c55e">${fmt(minV)}</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">📊 Média</div><div style="font-size:12px;font-weight:800;color:#f59e0b">${fmt(avgV)}</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">📈 Maior</div><div style="font-size:12px;font-weight:800;color:#ef4444">${fmt(maxV)}</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-head" style="grid-template-columns:72px 1fr 80px 36px"><span>Data</span><span>Preço</span><span>Cia</span><span></span></div>
+    <div>${rev.map((r,i)=>{const p=r[mode]||0;const deal=r.oferta?.toUpperCase()==="SIM";const best=p===minV&&p>0;return`<div class="tbl-row" style="grid-template-columns:72px 1fr 80px 36px;background:${deal?"#14532d18":best?"#1e3a5f18":i%2===0?"transparent":"#060d1a"}"><span style="font-size:10px;color:#64748b">${r.date}</span><span style="font-size:13px;font-weight:800;color:${p?pColor(p,fire,good):"#334155"}">${fmt(p)||"—"}</span><span style="font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.cia}</span><span style="font-size:13px;text-align:center">${deal?"🔥":best?"⭐":"—"}</span></div>`;}).join("")||'<div class="empty">Sem dados</div>'}</div>
   </div>`;
-  document.getElementById("ref-econ").innerHTML=REFS_ECON.map(row).join("");
-  document.getElementById("ref-exec").innerHTML=REFS_EXEC.map(row).join("");
+  setTimeout(()=>drawLine("fl-hist-chart",FL_DATA.map(r=>r[mode]),FL_DATA.map(r=>r.date),col,fire,minY,maxY,140),50);
 }
 
-// ── DICAS ─────────────────────────────────────────────────────────────────────
-function renderCronograma(){
-  const CRO=[
-    {d:"Mai–Jun 2026",t:"Configure alertas no Google Flights, Kayak e Skyscanner",c:"#38bdf8"},
-    {d:"Jul 2026",t:"Passagens começam a aparecer — monitore com atenção",c:"#38bdf8"},
-    {d:"Ago–Set 2026",t:"🎯 MELHOR JANELA — compre se o preço estiver bom",c:"#22c55e"},
-    {d:"Out–Nov 2026",t:"Segunda chance + Black Friday de passagens",c:"#f59e0b"},
-    {d:"Dez 2026",t:"⚠️ Risco aumenta — preços sobem com a proximidade",c:"#f97316"},
-    {d:"Jan–Abr 2027",t:"🚨 Última chance — tende a ser mais caro",c:"#ef4444"},
-  ];
-  document.getElementById("cronograma").innerHTML=CRO.map(m=>`
-    <div class="tl-item">
-      <div class="tl-dot" style="background:${m.c}"></div>
-      <div class="tl-date" style="color:${m.c}">${m.d}</div>
-      <div class="tl-text">${m.t}</div>
-    </div>`).join("");
+function renderFlCias(){
+  const el=document.getElementById("fl-2");
+  const m={};
+  FL_DATA.forEach(r=>{if(!r.cia||r.cia==="—")return;if(!m[r.cia])m[r.cia]={cia:r.cia,econs:[],execs:[],deals:0};if(r.econ>0)m[r.cia].econs.push(r.econ);if(r.exec>0)m[r.cia].execs.push(r.exec);if(r.oferta?.toUpperCase()==="SIM")m[r.cia].deals++;});
+  const cias=Object.values(m).map(c=>({cia:c.cia,minEcon:c.econs.length?Math.min(...c.econs):0,avgEcon:c.econs.length?Math.round(c.econs.reduce((a,b)=>a+b,0)/c.econs.length):0,minExec:c.execs.length?Math.min(...c.execs):0,deals:c.deals,dias:c.econs.length})).filter(c=>c.minEcon>0).sort((a,b)=>a.minEcon-b.minEcon);
+  if(!cias.length){el.innerHTML='<div class="card"><div class="empty"><div class="empty-icon">✈️</div>Comparativo por cia aparece quando as passagens abrirem.</div></div>';return;}
+  el.innerHTML=`
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px">Menor preço econômica por companhia</div>
+    <canvas id="fl-cias-chart" height="${Math.max(140,cias.length*36)}" style="width:100%"></canvas>
+  </div>
+  ${cias.map(c=>`<div class="card" style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:50%;background:${ciaColor(c.cia)}"></div><span style="font-size:15px;font-weight:800">${c.cia}</span></div>
+      ${c.deals>0?`<span class="tag pill-green">🔥 ${c.deals} oferta${c.deals>1?"s":""}</span>`:""}
+    </div>
+    <div class="grid3" style="margin-bottom:8px">
+      <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Menor Econ.</div><div style="font-size:12px;font-weight:800;color:${pColor(c.minEcon,FL_ECON_FIRE,FL_ECON_GOOD)}">${fmt(c.minEcon)}</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Média Econ.</div><div style="font-size:12px;font-weight:800;color:#94a3b8">${fmt(c.avgEcon)}</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:4px">Menor Exec.</div><div style="font-size:12px;font-weight:800;color:#a78bfa">${c.minExec?fmt(c.minExec):"—"}</div></div>
+    </div>
+    <div style="font-size:10px;color:#475569">Apareceu em ${c.dias} dia${c.dias!==1?"s":""}</div>
+  </div>`).join("")}`;
+  setTimeout(()=>drawBar("fl-cias-chart",cias.map(c=>c.cia.split(" ")[0]),cias.map(c=>c.minEcon),cias.map(c=>ciaColor(c.cia))),50);
 }
 
-function renderDicas(){
-  const DICAS=[
-    {e:"📅",t:"Quando comprar",c:"Para Maio 2027, a janela ideal é Agosto–Outubro 2026. Passagens costumam abrir com 11 meses de antecedência e atingem o menor preço entre 3–6 meses antes. Black Friday de novembro também pode ter promoções."},
-    {e:"📆",t:"Melhores dias da semana",c:"Terça e quarta-feira são historicamente 15–25% mais baratos. Evite embarcar sexta ou domingo — são os dias de maior demanda e preço."},
-    {e:"🏆",t:"Milhas na executiva",c:"LATAM Pass, Smiles e Livelo acumulam pontos em compras do dia a dia. Executiva Brasil–EUA pode sair de 80–130k pontos + taxas. MaxMilhas e Melhores Destinos monitoram disponibilidade de assentos."},
-    {e:"🧳",t:"Bagagem — cuidado!",c:"Tarifas Light (sem bagagem) parecem baratas mas adicionando a mala despachada ($35–60 por trecho) saem mais caro. Sempre filtre tarifas com pelo menos 23kg inclusos."},
-    {e:"👶",t:"Luca com 2 anos e 4 meses",c:"Crianças de 2 a 11 anos pagam cerca de 75% do adulto quando ocupam assento. Sem assento próprio pagam 10% — mas numa viagem de 10h+ com um toddler ativo, o assento próprio é essencial."},
-    {e:"⚡",t:"Erros de tarifa existem",c:"Assine Passagens Imperdíveis e Melhores Destinos — capturam quando uma cia lança por engano executiva a preço de econômica. Janela de compra: 2–6 horas. Tenha cartão sempre acessível!"},
-    {e:"🗓️",t:"Datas a evitar em Maio 2027",c:"Memorial Day: 26/05/2027 (feriado nos EUA — aeroportos lotados e caros). Melhor janela: 5 a 20 de Maio, especialmente terças e quartas."},
-    {e:"💳",t:"Cartão com milhas",c:"Nubank Ultravioleta, C6 Carbon, Itaú Personnalité — acumulam milhas em compras cotidianas. Coloque tudo no cartão (supermercado, contas, gasolina) e converta em passagens."},
-  ];
-  document.getElementById("dicas-list").innerHTML=DICAS.map((d,i)=>`
-    <div class="acc-item" onclick="toggleAcc(this)">
-      <div class="acc-head">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:20px">${d.e}</span>
-          <span style="font-size:13px;font-weight:700;color:#e2e8f0">${d.t}</span>
+function renderFlRotas(){
+  document.getElementById("fl-3").innerHTML=`
+  <div style="background:linear-gradient(135deg,#1e3a5f,#0a2540);border:1px solid #38bdf844;border-radius:18px;padding:20px;margin-bottom:14px">
+    <div style="font-size:10px;color:#38bdf8;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Estratégia recomendada</div>
+    <div style="font-size:24px;font-weight:900;color:#f0f9ff;margin-bottom:14px">Open Jaw ✈️</div>
+    <div class="route-step"><div class="route-icon">✈️</div><div><div style="font-size:13px;font-weight:700">GRU → MCO</div><div style="font-size:11px;color:#64748b">Voo de ida para Orlando</div></div></div>
+    <div class="route-step"><div class="route-icon">🎢</div><div><div style="font-size:13px;font-weight:700">Orlando (7–10 dias)</div><div style="font-size:11px;color:#64748b">Disney, Universal, Kennedy Space Center</div></div></div>
+    <div class="route-step"><div class="route-icon">🚗</div><div><div style="font-size:13px;font-weight:700">Drive MCO → MIA (~4h)</div><div style="font-size:11px;color:#64748b">Pela US-1 ou Florida Turnpike</div></div></div>
+    <div class="route-step"><div class="route-icon">🏖️</div><div><div style="font-size:13px;font-weight:700">Miami + Florida Keys (5–7 dias)</div><div style="font-size:11px;color:#64748b">South Beach, Wynwood, Key West</div></div></div>
+    <div class="route-step"><div class="route-icon">✈️</div><div><div style="font-size:13px;font-weight:700">MIA → GRU</div><div style="font-size:11px;color:#64748b">Voo de volta de Miami</div></div></div>
+    <div style="background:#0a1628;border-radius:12px;padding:12px 14px;margin-top:6px">
+      <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px">💡 Open Jaw economiza até R$2.400</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.6">Você paga a mesma tarifa de um roundtrip mas elimina o custo de voltar Miami→Orlando. Com 2 adultos, são até R$2.400 de economia.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px">MCO vs MIA — qual escolher?</div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card-sm"><div style="font-size:24px;margin-bottom:6px">🎢</div><div style="font-size:14px;font-weight:800">Orlando MCO</div><div style="font-size:11px;color:#38bdf8;font-weight:700;margin:6px 0">R$ 4.200–5.800</div><div style="font-size:10px;color:#86efac">✓ Entrada direta nos parques</div><div style="font-size:10px;color:#f87171;margin-top:4px">✗ Às vezes 10% mais caro</div></div>
+      <div class="card-sm"><div style="font-size:24px;margin-bottom:6px">🌴</div><div style="font-size:14px;font-weight:800">Miami MIA</div><div style="font-size:11px;color:#38bdf8;font-weight:700;margin:6px 0">R$ 3.900–5.400</div><div style="font-size:10px;color:#86efac">✓ Pode ser 15% mais barato</div><div style="font-size:10px;color:#f87171;margin-top:4px">✗ Carro obrigatório até Orlando</div></div>
+    </div>
+    <div style="background:#0a1628;border-radius:12px;padding:12px 14px;border:1px solid #f59e0b44"><div style="font-size:11px;color:#f59e0b;font-weight:700;margin-bottom:4px">⚠️ Sempre pesquise os dois</div><div style="font-size:12px;color:#94a3b8;line-height:1.6">A diferença pode chegar a R$1.200/pessoa. Com 2 adultos = R$2.400 de economia.</div></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:12px">💰 Referência de preços</div>
+    <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:8px">Econômica por pessoa</div>
+    ${[["🔥 Promoção","R$ 2.200–3.500","#22c55e","Compre já!"],["✅ Boa oferta","R$ 3.500–4.500","#86efac","Abaixo da média"],["😐 Normal","R$ 4.500–5.500","#f59e0b","Faixa típica"],["😬 Caro","Acima de R$ 5.500","#ef4444","Aguarde"]].map(([l,r,c,t])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0f1f38"><span class="tag" style="background:${c}22;color:${c}">${l}</span><div style="text-align:right"><div style="font-size:12px;font-weight:700">${r}</div><div style="font-size:10px;color:#64748b">${t}</div></div></div>`).join("")}
+    <div style="font-size:11px;color:#a78bfa;font-weight:700;margin:14px 0 8px">Executiva por pessoa</div>
+    ${[["🔥 Promoção","R$ 5.000–9.000","#22c55e","Raridade — compre já!"],["✅ Boa oferta","R$ 9.000–13.000","#86efac","Excelente CBR"],["😐 Normal","R$ 13.000–18.000","#f59e0b","Faixa típica"],["🚫 Caro","Acima de R$ 18.000","#ef4444","Use milhas"]].map(([l,r,c,t])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0f1f38"><span class="tag" style="background:${c}22;color:${c}">${l}</span><div style="text-align:right"><div style="font-size:12px;font-weight:700">${r}</div><div style="font-size:10px;color:#64748b">${t}</div></div></div>`).join("")}
+  </div>`;
+}
+
+function renderFlDicas(){
+  const el=document.getElementById("fl-4");
+  const CRO=[{d:"Mai–Jun 2026",t:"Configure alertas no Google Flights, Kayak e Skyscanner",c:"#38bdf8"},{d:"Jul 2026",t:"Passagens começam a aparecer — monitore com atenção",c:"#38bdf8"},{d:"Ago–Set 2026",t:"🎯 MELHOR JANELA — compre se o preço estiver bom",c:"#22c55e"},{d:"Out–Nov 2026",t:"Segunda chance + Black Friday de passagens",c:"#f59e0b"},{d:"Dez 2026",t:"⚠️ Risco aumenta — preços sobem com a proximidade",c:"#f97316"},{d:"Jan–Abr 2027",t:"🚨 Última chance — tende a ser mais caro",c:"#ef4444"}];
+  const DICAS=[{e:"📅",t:"Quando comprar",c:"Janela ideal: Agosto–Outubro 2026. Black Friday (novembro) também pode ter promoções."},{e:"📆",t:"Melhores dias da semana",c:"Terça e quarta-feira são 15–25% mais baratos. Evite embarcar sexta ou domingo."},{e:"🏆",t:"Milhas na executiva",c:"LATAM Pass, Smiles e Livelo acumulam pontos. Executiva Brasil–EUA sai de 80–130k pontos + taxas."},{e:"🧳",t:"Bagagem — cuidado!",c:"Tarifas Light (sem bagagem) parecem baratas mas adicionando a mala saem mais caro. Sempre filtre tarifas com 23kg inclusos."},{e:"👶",t:"Luca com 2 anos e 4 meses",c:"Com assento próprio paga ~75% do adulto. Sem assento = 10%, mas numa viagem de 10h com toddler, o assento próprio vale muito."},{e:"⚡",t:"Erros de tarifa",c:"O sistema roda 3x/dia justamente para capturar erros de tarifa. Assine também Passagens Imperdíveis e Melhores Destinos para cobertura máxima."},{e:"🗓️",t:"Evite Memorial Day",c:"26/05/2027 — feriado nos EUA. Aeroportos lotados e preços altos. Melhor janela: 5 a 20 de Maio, especialmente terças e quartas."},{e:"💳",t:"Cartão com milhas",c:"Nubank Ultravioleta, C6 Carbon, Itaú Personnalité — coloque tudo no cartão e acumule milhas para a executiva."}];
+  el.innerHTML=`
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px">📅 Cronograma de compra</div>
+    <div class="timeline">${CRO.map(m=>`<div class="tl-item"><div class="tl-dot" style="background:${m.c}"></div><div class="tl-date" style="color:${m.c}">${m.d}</div><div class="tl-text">${m.t}</div></div>`).join("")}</div>
+  </div>
+  <div class="section-label">Estratégias de compra</div>
+  ${DICAS.map((d,i)=>`<div class="acc-item" onclick="this.classList.toggle('open')"><div class="acc-head"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${d.e}</span><span style="font-size:13px;font-weight:700">${d.t}</span></div><span class="acc-arrow">▾</span></div><div class="acc-body">${d.c}</div></div>`).join("")}`;
+}
+
+// ── BUENOS AIRES RENDER ───────────────────────────────────────────────────────
+function renderBA(){
+  const i=CUR_TAB;
+  if(DEST!=="buenos_aires")return;
+  if(i===0)renderBAOport();
+  else if(i===1)renderBAHist();
+  else if(i===2)renderBADicas();
+}
+
+function getBAPriceForFeriado(nome,dataIda){
+  if(!BA_DATA.length)return null;
+  const match=BA_DATA.filter(r=>r.feriado===nome||r.data_ida===dataIda);
+  if(!match.length)return null;
+  return match[match.length-1];
+}
+
+function renderBAOport(){
+  const el=document.getElementById("ba-0");
+  const alerts=BA_DATA.filter(r=>r.alerta?.toUpperCase()==="SIM");
+  const hoje=new Date();
+  const proximos=FERIADOS.filter(f=>new Date(f.ida)>hoje).slice(0,6);
+  const passados=FERIADOS.filter(f=>new Date(f.ida)<=hoje);
+
+  let alertBanner="";
+  if(alerts.length) alertBanner=`<div class="alert-banner"><div style="font-size:14px;color:#86efac;font-weight:800">🔥 ${alerts.length} oferta Buenos Aires!</div><div style="font-size:12px;color:#4ade80;margin-top:4px">WhatsApp enviado</div></div>`;
+
+  const fCard=(f,isPast)=>{
+    const hist=getBAPriceForFeriado(f.nome,f.ida);
+    const preco=hist?hist.preco_pp:0;
+    const cia=hist?hist.cia:"—";
+    const oferta=hist?hist.oferta?.toUpperCase():"";
+    let cardClass="feriado-card";
+    let statusBadge="";
+    if(oferta==="SIM"||oferta==="ERRO"){cardClass+=" oferta";statusBadge=`<span class="tag pill-green">🔥 Oferta!</span>`;}
+    else if(oferta==="BOM"){cardClass+=" bom";statusBadge=`<span class="tag pill-blue">✅ Bom preço</span>`;}
+    else if(isPast){cardClass+=" feriado-card";}
+    return`<div class="${cardClass}${isPast?" opacity:0.6":""}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#e2e8f0">${f.nome}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${fmtDate(f.ida)} → ${fmtDate(f.volta)} • ${f.dias} dias</div>
         </div>
-        <span class="acc-arrow">▾</span>
+        <div style="text-align:right">
+          ${statusBadge||`<span class="tag" style="background:#1e293b;color:#64748b">${isPast?"Passado":"Aguardando"}</span>`}
+        </div>
       </div>
-      <div class="acc-body">${d.c}</div>
-    </div>`).join("");
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:22px;font-weight:900;color:${preco?pColor(preco,BA_FIRE,BA_GOOD):"#334155"}">${preco?fmt(preco):"—"}</div>
+          <div style="font-size:11px;color:#64748b">por pessoa • GRU → Buenos Aires • ${cia}</div>
+        </div>
+        ${preco?`<div style="background:#0a1628;border-radius:10px;padding:8px 12px;text-align:center"><div style="font-size:9px;color:#475569;font-weight:700;text-transform:uppercase">vs referência</div><div style="font-size:13px;font-weight:800;color:${pColor(preco,BA_FIRE,BA_GOOD)}">${preco<=BA_ERRO?"🚨 Erro de tarifa":preco<=BA_FIRE?"🔥 Promoção":preco<=BA_GOOD?"✅ Bom":"😐 Normal"}</div></div>`:""}
+      </div>
+    </div>`;
+  };
+
+  el.innerHTML=`
+  <div class="status-bar">
+    <div style="font-size:12px;color:#64748b">Monitorando GRU → EZE/AEP</div>
+    <div style="font-size:11px;color:#475569">${BA_DATA.length} registros</div>
+    <button onclick="loadAll()" style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:7px 12px;color:#94a3b8;font-size:14px">🔄</button>
+  </div>
+  ${alertBanner}
+  <div style="background:#0a1628;border:1px solid #38bdf844;border-radius:14px;padding:12px 14px;margin-bottom:14px">
+    <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:4px">🚨 Detector de erro de tarifa ativo</div>
+    <div style="font-size:12px;color:#94a3b8;line-height:1.5">Alerta imediato se econômica GRU→BsAs aparecer abaixo de <strong style="color:#ef4444">R$280/pessoa</strong> (possível erro) ou <strong style="color:#22c55e">R$500/pessoa</strong> (promoção). O script roda 3x/dia para não perder oportunidades.</div>
+  </div>
+  ${!BA_SHEETS?`<div style="background:#1c1a0f;border:1px solid #854d0e;border-radius:12px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#fcd34d;font-weight:700">⚙️ Aba Buenos Aires ainda não conectada</div><div style="font-size:11px;color:#f59e0b;margin-top:4px">Publique a aba "Buenos Aires" do Sheets e atualize a variável BA_SHEETS no topo do código do portal.</div></div>`:""}
+  <div class="section-label">Próximos feriados prolongados</div>
+  ${proximos.map(f=>fCard(f,false)).join("")}
+  ${passados.length?`<div class="section-label" style="margin-top:16px">Feriados passados</div>${passados.slice(-3).reverse().map(f=>fCard(f,true)).join("")}`:""}`;
 }
 
-function toggleAcc(el){el.classList.toggle("open")}
-
-// ── CHARTS (Canvas puro) ─────────────────────────────────────────────────────
-function drawLineChart(id,values,labels,color,fireLine,minY,maxY,h){
-  const canvas=document.getElementById(id);
-  if(!canvas)return;
-  canvas.height=h;
-  const ctx=canvas.getContext("2d");
-  const W=canvas.offsetWidth||300;
-  canvas.width=W;
-  ctx.clearRect(0,0,W,h);
-  const pad={t:10,r:10,b:20,l:42};
-  const cW=W-pad.l-pad.r, cH=h-pad.t-pad.b;
-  const vals=values.filter(Boolean);
-  if(!vals.length)return;
-  const range=maxY-minY;
-  const toX=i=>(pad.l+i*(cW/(values.length-1||1)));
-  const toY=v=>(pad.t+cH-(((v||minY)-minY)/range)*cH);
-  // grid
-  ctx.strokeStyle="#0f1f38"; ctx.lineWidth=1;
-  [0,.25,.5,.75,1].forEach(p=>{
-    const y=pad.t+cH*p; ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
-    ctx.fillStyle="#475569"; ctx.font="9px sans-serif"; ctx.textAlign="right";
-    ctx.fillText("R$"+Math.round(maxY-p*(maxY-minY))/1000+"k",pad.l-4,y+3);
-  });
-  // fire reference line
-  const fireY=toY(fireLine);
-  ctx.strokeStyle="#22c55e"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.moveTo(pad.l,fireY);ctx.lineTo(pad.l+cW,fireY);ctx.stroke();
-  ctx.setLineDash([]);
-  // line
-  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.lineJoin="round";
-  ctx.beginPath();
-  values.forEach((v,i)=>{if(!v)return;const x=toX(i),y=toY(v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  ctx.stroke();
-  // dots
-  values.forEach((v,i)=>{
-    if(!v)return;
-    const x=toX(i),y=toY(v);
-    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
-  });
-  // x labels (first and last)
-  ctx.fillStyle="#475569"; ctx.font="8px sans-serif"; ctx.textAlign="center";
-  if(labels.length){ctx.fillText(labels[0],toX(0),h-4);ctx.fillText(labels[labels.length-1],toX(labels.length-1),h-4);}
+function renderBAHist(){
+  const el=document.getElementById("ba-1");
+  if(!BA_DATA.length){el.innerHTML='<div class="card"><div class="empty"><div class="empty-icon">📊</div>Histórico de Buenos Aires aparece após o script começar a monitorar os feriados.</div></div>';return;}
+  const rev=[...BA_DATA].reverse();
+  el.innerHTML=`
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-head" style="grid-template-columns:90px 80px 1fr 60px"><span>Feriado</span><span>Preço/pp</span><span>Cia</span><span></span></div>
+    <div>${rev.map((r,i)=>{const deal=r.oferta?.toUpperCase()==="SIM"||r.oferta?.toUpperCase()==="ERRO";return`<div class="tbl-row" style="grid-template-columns:90px 80px 1fr 60px;background:${deal?"#14532d18":i%2===0?"transparent":"#060d1a"}"><span style="font-size:9px;color:#64748b;line-height:1.3">${r.feriado}</span><span style="font-size:13px;font-weight:800;color:${r.preco_pp?pColor(r.preco_pp,BA_FIRE,BA_GOOD):"#334155"}">${r.preco_pp?fmt(r.preco_pp):"—"}</span><span style="font-size:10px;color:#94a3b8">${r.cia}</span><span style="font-size:11px;text-align:center">${deal?"🔥":r.oferta?.toUpperCase()==="BOM"?"✅":"—"}</span></div>`;}).join("")}</div>
+  </div>`;
 }
 
-function drawBarChart(id,labels,values,colors){
-  const canvas=document.getElementById(id);
-  if(!canvas)return;
-  const h=Math.max(160,labels.length*36);
-  canvas.height=h;
-  const ctx=canvas.getContext("2d");
-  const W=canvas.offsetWidth||300;
-  canvas.width=W;
-  ctx.clearRect(0,0,W,h);
-  const pad={t:10,r:60,b:10,l:70};
-  const cW=W-pad.l-pad.r, cH=h-pad.t-pad.b;
-  const maxV=Math.max(...values)*1.1||1;
-  const barH=Math.min(24,cH/values.length-8);
+function renderBADicas(){
+  document.getElementById("ba-2").innerHTML=`
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:12px">💰 Referência de preços GRU → Buenos Aires</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px">Roundtrip, por pessoa, classe econômica</div>
+    ${[["🚨 Erro de tarifa","Abaixo de R$280","#ef4444","Provavelmente será cancelado — compre e torça!"],["🔥 Promoção imperdível","R$280–500","#22c55e","Compre imediatamente! Raro!"],["✅ Ótimo preço","R$500–900","#86efac","Abaixo da média — aproveite"],["😐 Preço normal","R$900–1.400","#f59e0b","Faixa típica de mercado"],["😬 Caro","Acima de R$1.400","#ef4444","Aguarde promoção"]].map(([l,r,c,t])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0f1f38"><span class="tag" style="background:${c}22;color:${c}">${l}</span><div style="text-align:right"><div style="font-size:11px;font-weight:700">${r}</div><div style="font-size:10px;color:#64748b">${t}</div></div></div>`).join("")}
+  </div>
+  <div class="section-label">Dicas para Buenos Aires</div>
+  ${[{e:"🗓️",t:"Quando os preços aparecem",c:"GRU→Buenos Aires costuma aparecer com 2–4 meses de antecedência. Para feriados, busque com pelo menos 60 dias de antecedência."},{e:"⚡",t:"Erros de tarifa são comuns nessa rota",c:"Buenos Aires é destino frequente de promoções relâmpago e erros de tarifa. Com o sistema rodando 3x/dia, as chances de capturar são altas. Tenha o cartão sempre disponível."},{e:"✈️",t:"Aeroportos de Buenos Aires",c:"EZE (Ezeiza) é o internacional — mais distante do centro. AEP (Aeroparque) é o doméstico/regional — mais próximo. Para voos do Brasil, geralmente é EZE."},{e:"🏨",t:"4–5 dias é o ideal",c:"Com 4 dias (partindo quinta) você aproveita Palermo, San Telmo, La Boca, Tigre e um show de tango. 5 dias permite incluir Colônia do Sacramento (Uruguai) de barco."},{e:"💰",t:"Buenos Aires é muito barato pra brasileiros",c:"Com o câmbio atual, hospedagem e alimentação em BsAs custam cerca de 40–60% do que você pagaria no Brasil. Vale a pena aproveitar qualquer boa passagem!"},{e:"🛂",t:"Sem visto para brasileiros",c:"Brasileiros entram em Buenos Aires apenas com o passaporte válido (ou RG com chip). Luca precisa do passaporte ou certidão de nascimento."}].map((d,i)=>`<div class="acc-item" onclick="this.classList.toggle('open')"><div class="acc-head"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">${d.e}</span><span style="font-size:13px;font-weight:700">${d.t}</span></div><span class="acc-arrow">▾</span></div><div class="acc-body">${d.c}</div></div>`).join("")}`;
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+function drawLine(id,values,labels,color,fireLine,minY,maxY,h){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  canvas.height=h;const ctx=canvas.getContext("2d");const W=canvas.offsetWidth||300;canvas.width=W;ctx.clearRect(0,0,W,h);
+  const pad={t:10,r:10,b:20,l:40};const cW=W-pad.l-pad.r,cH=h-pad.t-pad.b;
+  const vals=values.filter(Boolean);if(!vals.length)return;
+  const toX=i=>pad.l+i*(cW/Math.max(values.length-1,1));
+  const toY=v=>pad.t+cH-(((v||minY)-minY)/(maxY-minY))*cH;
+  [0,.25,.5,.75,1].forEach(p=>{const y=pad.t+cH*p;ctx.strokeStyle="#0f1f38";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();ctx.fillStyle="#475569";ctx.font="9px sans-serif";ctx.textAlign="right";ctx.fillText("R$"+Math.round(maxY-p*(maxY-minY))/1000+"k",pad.l-4,y+3);});
+  const fY=toY(fireLine);ctx.strokeStyle="#22c55e";ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pad.l,fY);ctx.lineTo(pad.l+cW,fY);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin="round";ctx.beginPath();let first=true;
+  values.forEach((v,i)=>{if(!v)return;const x=toX(i),y=toY(v);if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);});ctx.stroke();
+  values.forEach((v,i)=>{if(!v)return;ctx.beginPath();ctx.arc(toX(i),toY(v),3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+  ctx.fillStyle="#475569";ctx.font="8px sans-serif";ctx.textAlign="center";
+  if(labels.length){ctx.fillText(labels[0],toX(0),h-4);if(labels.length>1)ctx.fillText(labels[labels.length-1],toX(labels.length-1),h-4);}
+}
+
+function drawBar(id,labels,values,colors){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const h=Math.max(140,labels.length*36);canvas.height=h;
+  const ctx=canvas.getContext("2d");const W=canvas.offsetWidth||300;canvas.width=W;ctx.clearRect(0,0,W,h);
+  const pad={t:10,r:60,b:10,l:65};const cW=W-pad.l-pad.r,cH=h-pad.t-pad.b;
+  const maxV=Math.max(...values)*1.1||1;const barH=Math.min(22,cH/values.length-6);
   values.forEach((v,i)=>{
-    const y=pad.t+i*(cH/values.length)+(cH/values.length-barH)/2;
-    const bW=(v/maxV)*cW;
-    // bar
-    ctx.fillStyle=colors[i]||"#7c3aed";
-    const r=6;
-    ctx.beginPath();ctx.moveTo(pad.l+r,y);ctx.lineTo(pad.l+bW-r,y);ctx.quadraticCurveTo(pad.l+bW,y,pad.l+bW,y+r);ctx.lineTo(pad.l+bW,y+barH-r);ctx.quadraticCurveTo(pad.l+bW,y+barH,pad.l+bW-r,y+barH);ctx.lineTo(pad.l+r,y+barH);ctx.quadraticCurveTo(pad.l,y+barH,pad.l,y+barH-r);ctx.lineTo(pad.l,y+r);ctx.quadraticCurveTo(pad.l,y,pad.l+r,y);ctx.closePath();ctx.fill();
-    // label
-    ctx.fillStyle="#94a3b8"; ctx.font="bold 11px sans-serif"; ctx.textAlign="right";
-    ctx.fillText(labels[i],pad.l-6,y+barH/2+4);
-    // value
-    ctx.fillStyle="#e2e8f0"; ctx.font="bold 11px sans-serif"; ctx.textAlign="left";
-    ctx.fillText("R$"+(v/1000).toFixed(1)+"k",pad.l+bW+6,y+barH/2+4);
-    // fire line
-    if(i===0){const fx=pad.l+(ECON_FIRE/maxV)*cW;ctx.strokeStyle="#22c55e";ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(fx,pad.t);ctx.lineTo(fx,h-pad.b);ctx.stroke();ctx.setLineDash([]);}
+    const y=pad.t+i*(cH/values.length)+(cH/values.length-barH)/2;const bW=(v/maxV)*cW;const r=5;
+    ctx.fillStyle=colors[i]||"#7c3aed";ctx.beginPath();ctx.moveTo(pad.l+r,y);ctx.lineTo(pad.l+bW-r,y);ctx.quadraticCurveTo(pad.l+bW,y,pad.l+bW,y+r);ctx.lineTo(pad.l+bW,y+barH-r);ctx.quadraticCurveTo(pad.l+bW,y+barH,pad.l+bW-r,y+barH);ctx.lineTo(pad.l+r,y+barH);ctx.quadraticCurveTo(pad.l,y+barH,pad.l,y+barH-r);ctx.lineTo(pad.l,y+r);ctx.quadraticCurveTo(pad.l,y,pad.l+r,y);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#94a3b8";ctx.font="bold 10px sans-serif";ctx.textAlign="right";ctx.fillText(labels[i],pad.l-5,y+barH/2+4);
+    ctx.fillStyle="#e2e8f0";ctx.font="bold 10px sans-serif";ctx.textAlign="left";ctx.fillText("R$"+(v/1000).toFixed(1)+"k",pad.l+bW+5,y+barH/2+4);
   });
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
-renderRefTable();
-renderCronograma();
-renderDicas();
-loadData();
+updateTabBar();
+loadAll();
 </script>
 </body>
 </html>
